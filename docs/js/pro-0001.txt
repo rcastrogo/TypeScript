@@ -1,0 +1,83 @@
+﻿
+
+DEFINE hideDetail         = false
+DEFINE hiddenHeaders      = 0
+DEFINE repeatHeader       = 1
+DEFINE repeatHeaderAfter  = 0
+DEFINE tableId            = tbl-rpt0001
+DEFINE detailId           = tbl-rpt0001-d
+DEFINE group01Id          = tbl-rpt0001-nombre
+DEFINE grandTotalId       = tbl-rpt0001-total
+
+DEFINE summary       = { }
+DEFINE orderBy       = _descripcion,_nombre
+
+FUNCTION Iteratefn 
+  
+END
+
+FUNCTION onStartfn
+
+  ctx.fn = {
+    sayHello: function (a, b, c, d) {
+      console.log(a,b,c,d);
+      alert('Hola');
+    },
+    headerG1 : function(key, b){
+      return '<tr class="w3-teal"><td colspan="5">{0}</td></tr>'.format(key);
+    },
+    fixDate : function(value, b){
+      return value.fixDate();
+    },
+    fixDate2 : function(scope, sender, value, a, b, c){
+      return '- ' + value.fixDate();
+    }
+  }
+
+  this.getContext = function () {
+    return { BS : ctx };
+  }
+
+END
+
+# ========================================================
+# Cabecera 1
+# ======================================================== 
+CREATE  header className:report-title
+ADD_COL colspan:5 html:'Listado de proveedores'
+
+# ========================================================
+# Cabecera 2  
+# ======================================================== 
+CREATE  header className:header
+ADD_COL html:'Id' style:width:2em
+ADD_COL html:'Nif' style:width:8em
+ADD_COL html:'Nombre' 
+ADD_COL html:'Fecha de alta' style:width:10em
+ADD_COL html:'+' style:width:10em
+
+# =============================================================================
+# Detalle
+# =============================================================================
+DEFINE  __COL_5_INNERHTML = <div class="w3-red"><h2 xbind>{BS.data._nombre|toUpperCase}</h2></div>
+CREATE  detail id:@detailId
+ADD_COL xbind:'innerHTML:BS.data._id' on-click:'BS.fn.sayHello:@BS.recordCount:1:2'
+ADD_COL xbind:'innerHTML:BS.data._nif|toUpperCase'
+ADD_COL xbind:'innerHTML:BS.data._nombre|toUpperCase'
+ADD_COL xbind:'innerHTML:BS.fn.fixDate2 @BS.data._fechaDeAlta,abc,9'
+ADD_COL xbind:'' id:'txt-{BS.data._id}' html:@__COL_5_INNERHTML
+
+# ===========================================================================================
+# Grupo 1 (Marca)
+# ===========================================================================================
+DEFINE  HTML_EJERCICIO = Total empresa
+CREATE  group id:@group01Id className:rpt-total key:_descripcion header:BS.fn.headerG1
+ADD_COL colspan:4 html:@HTML_EJERCICIO style:text-align:right;font-weight:bold
+ADD_COL className:integer xbind:'innerHTML:BS.G1.recordCount'
+
+# ==========================================================================
+# Total Listado
+# ==========================================================================
+CREATE  group id:@grandTotalId className:rpt-total
+ADD_COL colspan:4 html:'Total Listado' style:text-align:right;font-weight:bold
+ADD_COL className:integer xbind:'innerHTML:BS.recordCount'
