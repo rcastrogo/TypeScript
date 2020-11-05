@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "./dist-js/",
     "noImplicitAny": true,
-    "module": "CommonJS", 
+    "module": "ES6", // Para browserify "CommonJS"
     "importHelpers": true,
     "moduleResolution": "node",
     "sourceMap": false,
