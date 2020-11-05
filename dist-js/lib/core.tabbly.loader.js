@@ -41,8 +41,8 @@ function loadReport(code) {
     function __getAttributes(data) {
         var __attributes = [];
         Object.keys(data)
-            .filter((key) => { return key != 'columns' && key != 'html' && data.hasOwnProperty(key); })
-            .forEach((key) => {
+            .filter(function (key) { return key != 'columns' && key != 'html' && data.hasOwnProperty(key); })
+            .forEach(function (key) {
             var __k = key == 'className' ? 'class' : key;
             __attributes.push('{0}="{1}"'.format(__k, __getValue(data[key])));
         });
@@ -52,10 +52,10 @@ function loadReport(code) {
         function fill(data, hide, header) {
             var sb = '';
             var cellTag = header ? 'th' : 'td';
-            (data || []).forEach((row, i) => {
+            (data || []).forEach(function (row, i) {
                 var sb_row = '';
                 sb_row += '\n      <tr{0}>'.format(__getAttributes(row));
-                row.columns.forEach((col, i) => {
+                row.columns.forEach(function (col, i) {
                     sb_row += '\n        <{2}{0}>{1}</{2}>'.format(__getAttributes(col), __getValue(col.html), cellTag);
                 });
                 sb_row += '\n      </tr>';
@@ -159,4 +159,3 @@ function loadReport(code) {
 }
 var loader = { load: loadReport };
 exports.loader = loader;
-//# sourceMappingURL=core.tabbly.loader.js.map

@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
-const core_1 = require("./core");
-class ReportEngine {
-    constructor() {
+var core_1 = require("./core");
+var ReportEngine = /** @class */ (function () {
+    function ReportEngine() {
         this.BS = {};
     }
-    generateReport(rd, data, mediator) {
+    ReportEngine.prototype.generateReport = function (rd, data, mediator) {
         var __that = this;
         mediator.clear();
         mediator.message({ type: 'report.begin' });
@@ -300,8 +300,8 @@ class ReportEngine {
         mediator.message({ type: 'report.end' });
         mediator.flush();
         //console.timeEnd('Render');
-    }
-    merge(template, o) {
+    };
+    ReportEngine.prototype.merge = function (template, o) {
         return template.replace(/{([^{]+)?}/g, function (m, key) {
             if (key.indexOf(':') > 0) {
                 var __fn = key.split(':');
@@ -312,19 +312,19 @@ class ReportEngine {
             var r = core_1.core.getValue(key, o);
             return typeof (r) == 'function' ? r(o) : r;
         });
-    }
-    copy(s, d) {
+    };
+    ReportEngine.prototype.copy = function (s, d) {
         Object.keys(d)
             .map(function (k) { d[k] = s[k]; });
-    }
-    sum(s, d) {
+    };
+    ReportEngine.prototype.sum = function (s, d) {
         Object.keys(d)
             .map(function (k) { d[k] += s[k]; });
-    }
-    compute(ds, name) {
+    };
+    ReportEngine.prototype.compute = function (ds, name) {
         return ds.reduce(function (t, o) { return t + o[name]; }, 0.0);
-    }
-    group(a, c) {
+    };
+    ReportEngine.prototype.group = function (a, c) {
         var ds = a;
         var __f = function (k, t) {
             ds.distinct(function (v) { return v[k]; })
@@ -332,13 +332,15 @@ class ReportEngine {
             return __f;
         };
         return __f;
-    }
-}
+    };
+    return ReportEngine;
+}());
 exports.ReportEngine = ReportEngine;
 // ===========================================================================
 // Ejemplo de control de mensajes enviados por el motor de informes
 // ===========================================================================
 function onMessage(message) {
+    var _this = this;
     // =======================================================================
     // report.content
     // =======================================================================
@@ -388,10 +390,10 @@ function onMessage(message) {
     // report.end
     // =======================================================================
     if (message.type === 'report.end') {
-        setTimeout(() => {
-            this._progressBar.style.width = '100%';
-            this._progressBarMessage.innerHTML = '';
-            this._progressBarContainer.style.display = 'none';
+        setTimeout(function () {
+            _this._progressBar.style.width = '100%';
+            _this._progressBarMessage.innerHTML = '';
+            _this._progressBarContainer.style.display = 'none';
         }, 250);
         return;
     }
@@ -425,4 +427,3 @@ function onMessage(message) {
 //    module.ajax.post(o.report.data, '', __dataReady)
 //}
 //}
-//# sourceMappingURL=core.tabbly.v2.engine.js.map

@@ -125,4 +125,3 @@ function loadReport(code) {
 }
 var loader = { load: loadReport };
 exports.loader = loader;
-//# sourceMappingURL=core.tabbly.v2.loader.js.map

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
-const core_1 = require("./core");
-const core_templates_1 = require("./core.templates");
-class ReportEngine {
-    constructor() {
+var core_1 = require("./core");
+var core_templates_1 = require("./core.templates");
+var ReportEngine = /** @class */ (function () {
+    function ReportEngine() {
         this.BS = {};
         this.module_ReportEngine_Copy = function (source, dest) {
             for (var p in dest) {
@@ -60,31 +60,31 @@ class ReportEngine {
             }
         };
     }
-    __cloneRowTemplate(e) {
+    ReportEngine.prototype.__cloneRowTemplate = function (e) {
         var __row = e.cloneNode(true);
         var __table = e.parentNode.parentNode;
         __table.deleteRow(e.rowIndex);
         return __row;
-    }
-    __fillTemplate(e, scope) {
+    };
+    ReportEngine.prototype.__fillTemplate = function (e, scope) {
         var _elements = e.querySelectorAll('[xbind]')
             .toArray();
         if (e.attributes.getNamedItem('xbind'))
             _elements.push(e);
-        _elements.forEach((child) => {
+        _elements.forEach(function (child) {
             // ============================================================================
             // Atributos que es necesario procesar. Ej: id="txt-{index}"
             // ============================================================================
             core_1.core.toArray(child.attributes)
                 .where({ value: /{[^{]+?}/g })
-                .map(a => a.value = core_templates_1.merge(a.value, scope));
+                .map(function (a) { return a.value = core_templates_1.merge(a.value, scope); });
             // ============================================================================
             // Nodos texto de este elemento
             // ============================================================================
             core_1.core.toArray(child.childNodes)
                 .where({ nodeType: 3 })
                 .where({ textContent: /{[^{]+?}/g })
-                .forEach(text => text.textContent = core_templates_1.merge(text.textContent, scope, text));
+                .forEach(function (text) { return text.textContent = core_templates_1.merge(text.textContent, scope, text); });
             // ============================================================================
             // Propiedades que establecer
             // ============================================================================
@@ -92,7 +92,7 @@ class ReportEngine {
                 .getNamedItem('xbind')
                 .value
                 .split(';'))
-                .forEach((token) => {
+                .forEach(function (token) {
                 if (token === '')
                     return;
                 var _tokens = String.trimValues(token.split(':'));
@@ -100,7 +100,7 @@ class ReportEngine {
                 var _value = core_1.core.getValue(_params[0], scope);
                 if (core_1.core.isFunction(_value)) {
                     var _args = _params.slice(1)
-                        .reduce((a, p) => {
+                        .reduce(function (a, p) {
                         // xbind="textContent:Data.fnTest @PlainObject,A,5"
                         a.push(p.charAt(0) == '@' ? core_1.core.getValue(p.slice(1), scope) : p);
                         return a;
@@ -115,10 +115,11 @@ class ReportEngine {
             });
         });
         return e;
-    }
-    __mergeTemplate(template, sb, context, onGroupFooter) {
+    };
+    ReportEngine.prototype.__mergeTemplate = function (template, sb, context, onGroupFooter) {
+        var _this = this;
         if (template.forEach)
-            return template.forEach((t, i) => { this.__mergeTemplate(t, sb, context[i], onGroupFooter); });
+            return template.forEach(function (t, i) { _this.__mergeTemplate(t, sb, context[i], onGroupFooter); });
         this.__fillTemplate(template, { BS: this.BS });
         if (context.tag || context.tag == 'nofooter')
             return;
@@ -126,8 +127,9 @@ class ReportEngine {
         if (onGroupFooter) {
             onGroupFooter({ "sb": sb, "section": context });
         }
-    }
-    module_ReportEngine_processAll(o) {
+    };
+    ReportEngine.prototype.module_ReportEngine_processAll = function (o) {
+        var _this = this;
         var __doc = document.createDocumentFragment();
         __doc.appendChild(core_1.core.build('div', { innerHTML: o.ReportTemplate }, false));
         o.DetailTemplate = this.__cloneRowTemplate(__doc.querySelector(o.DetailTemplateSelector));
@@ -139,11 +141,11 @@ class ReportEngine {
             o.TotalTemplate = this.__cloneRowTemplate(__doc.querySelector(o.TotalTemplateSelector));
         }
         o.GroupsTemplates = [];
-        o.GroupsTemplates = o.Grupos.map((g) => this.__cloneRowTemplate(__doc.querySelector(g.selector)));
+        o.GroupsTemplates = o.Grupos.map(function (g) { return _this.__cloneRowTemplate(__doc.querySelector(g.selector)); });
         var __that = this;
         var _g_id = -1;
         function __DoHeaders() {
-            o.Grupos.forEach((grupo, ii) => {
+            o.Grupos.forEach(function (grupo, ii) {
                 if (ii < _g_id)
                     return;
                 var g = o.Grupos[ii];
@@ -171,7 +173,7 @@ class ReportEngine {
         }
         var _sb = core_1.core.createStringBuilder('');
         o.OnStart(o.DataSet);
-        o.DataSet.forEach((r, i) => {
+        o.DataSet.forEach(function (r, i) {
             if (i == 0)
                 __DoHeaders();
             o.OnRow(r);
@@ -181,7 +183,7 @@ class ReportEngine {
                 });
             }
             else {
-                o.Grupos.some((g, i) => {
+                o.Grupos.some(function (g, i) {
                     if (!g.test(r)) {
                         _g_id = i;
                         var __templates = o.GroupsTemplates.map(function (t) { return t; });
@@ -190,8 +192,8 @@ class ReportEngine {
                         var __groups = o.Grupos.map(function (g) { return g; });
                         __groups.splice(0, i);
                         __groups.reverse();
-                        this.__mergeTemplate(__templates, _sb, __groups, o.OnGroupFooter);
-                        o.Grupos.forEach((grupo, ii) => {
+                        _this.__mergeTemplate(__templates, _sb, __groups, o.OnGroupFooter);
+                        o.Grupos.forEach(function (grupo, ii) {
                             if (ii >= i) {
                                 grupo.init(r);
                                 _g_id = i;
@@ -209,7 +211,7 @@ class ReportEngine {
             }
             if (o.HideDetail)
                 return;
-            this.__mergeTemplate(o.DetailTemplate, _sb, { name: 'detail' }, o.g);
+            _this.__mergeTemplate(o.DetailTemplate, _sb, { name: 'detail' }, o.g);
         });
         if (o.DataSet.length > 0) {
             this.BS.previous = this.BS.data;
@@ -225,8 +227,9 @@ class ReportEngine {
         return __doc.querySelector(o.ReportTableSelector)
             .innerHTML
             .replace('<tbody>', '<tbody>' + _sb.value);
-    }
-    fromReportDefinition(rd, data, callback) {
+    };
+    ReportEngine.prototype.fromReportDefinition = function (rd, data, callback) {
+        var _this = this;
         var __that = this;
         this.BS = { reportDefinition: rd };
         // ================================================================================================
@@ -243,7 +246,7 @@ class ReportEngine {
         function __createGroups() {
             return rd.groups
                 .where(function (g, i) { return i < rd.groups.length - 1; })
-                .map((g, i) => {
+                .map(function (g, i) {
                 return {
                     name: 'G' + (i + 1),
                     selector: '#' + g.id,
@@ -290,23 +293,23 @@ class ReportEngine {
             Headers: rd.headers,
             RepeatHeaders: (rd.repeatHeader || '').split(','),
             RepeatHeadersAfter: rd.repeatHeaderAfter,
-            OnRow: (data) => {
+            OnRow: function (data) {
                 __that.BS.recordCount += 1;
                 __that.BS.previous = __that.BS.data || data;
                 __that.BS.data = data;
-                __wrapper.Grupos.forEach((g, i) => { __that.BS[g.name].data = Object.create(g.data); });
+                __wrapper.Grupos.forEach(function (g, i) { __that.BS[g.name].data = Object.create(g.data); });
                 __that.module_ReportEngine_Sum(data, __that.BS.G0);
                 if (rd.onRowfn)
-                    (new Function('ctx', rd.onRowfn)(this.BS));
+                    (new Function('ctx', rd.onRowfn)(_this.BS));
             },
-            OnStart: (dataSet) => {
+            OnStart: function (dataSet) {
                 __that.BS = {
                     recordCount: 0,
                     G0: core_1.core.clone(__summary),
                     dataSet: dataSet,
                     reportDefinition: __that.BS.reportDefinition
                 };
-                __wrapper.Grupos.forEach((g, i) => {
+                __wrapper.Grupos.forEach(function (g, i) {
                     g.current = (dataSet && dataSet[0]) ? dataSet[0][g.key] : '';
                     __that.BS[g.name] = { recordCount: 0, all: {} };
                 });
@@ -319,14 +322,14 @@ class ReportEngine {
                 if (rd.onRowEndfn)
                     (new Function('ctx', rd.onRowEndfn)(__that.BS));
             },
-            PrintReport: (callback) => {
+            PrintReport: function (callback) {
                 if (callback)
-                    callback(this.module_ReportEngine_processAll(__wrapper));
-                return this;
+                    callback(_this.module_ReportEngine_processAll(__wrapper));
+                return _this;
             }
         };
         return __wrapper.PrintReport(callback);
-    }
-}
+    };
+    return ReportEngine;
+}());
 exports.ReportEngine = ReportEngine;
-//# sourceMappingURL=core.tabbly.engine.js.map

@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ajax = void 0;
 var ajax = {
     get: function (url, interceptor) {
-        return new Promise((resolve, reject) => {
+        return new Promise(function (resolve, reject) {
             var xml = ajax.createXMLHttpRequest();
             xml.open('GET', url, true);
             if (interceptor)
@@ -18,7 +18,7 @@ var ajax = {
         });
     },
     post: function (url, body, interceptor) {
-        return new Promise((resolve, reject) => {
+        return new Promise(function (resolve, reject) {
             var xml = ajax.createXMLHttpRequest();
             xml.open('POST', url, true);
             if (interceptor) {
@@ -45,4 +45,3 @@ var ajax = {
     }
 };
 exports.ajax = ajax;
-//# sourceMappingURL=core.ajax.js.map

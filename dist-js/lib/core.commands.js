@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManager = void 0;
 function CommandManager(doc) {
     var _this = {
-        getDocument: () => doc,
+        getDocument: function () { return doc; },
         undos: new Array(),
         redos: new Array(),
         clear: function () {
@@ -48,4 +48,3 @@ function CommandManager(doc) {
 }
 exports.CommandManager = CommandManager;
 ;
-//# sourceMappingURL=core.commands.js.map

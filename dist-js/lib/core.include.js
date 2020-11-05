@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var includes = [];
 function include(url) {
-    return new Promise((resolve) => {
+    return new Promise(function (resolve) {
         function __resolve() {
             includes.push(url.toLowerCase());
             resolve();
@@ -27,4 +27,3 @@ function include(url) {
     });
 }
 exports.default = include;
-//# sourceMappingURL=core.include.js.map

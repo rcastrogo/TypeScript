@@ -1,40 +1,40 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addEventListeners = void 0;
-const core_1 = require("./core");
-const core_pub_sub_1 = require("./core.pub-sub");
-const EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
+var core_1 = require("./core");
+var core_pub_sub_1 = require("./core.pub-sub");
+var EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
 function addEventListeners(container, handlers, context) {
-    let fn = {
-        innerHTML: (e, value) => e.innerHTML = value,
-        className: (e, value) => e.className = value
+    var fn = {
+        innerHTML: function (e, value) { return e.innerHTML = value; },
+        className: function (e, value) { return e.className = value; }
     };
-    EVENTS.forEach((selector, index) => {
+    EVENTS.forEach(function (selector, index) {
         container
             .querySelectorAll(selector)
             .toArray()
             .concat([container])
-            .forEach(e => {
-            let name = selector.replace('[', '').replace(']', '');
+            .forEach(function (e) {
+            var name = selector.replace('[', '').replace(']', '');
             if (!e.attributes.getNamedItem(name))
                 return;
-            let value = e.attributes.getNamedItem(name).value;
-            let tokens = value.split(':');
+            var value = e.attributes.getNamedItem(name).value;
+            var tokens = value.split(':');
             // =============================================================
             // on-click
             // =============================================================
             if (index === 0) {
-                let fn = handlers[tokens[0]] ||
+                var fn_1 = handlers[tokens[0]] ||
                     core_1.core.getValue(tokens[0], context);
-                e.onclick = (event) => {
-                    let _args = tokens.slice(1)
+                e.onclick = function (event) {
+                    var _args = tokens.slice(1)
                         .reduce(function (a, p) {
                         a.push(p.charAt(0) == '@'
                             ? core_1.core.getValue(p.slice(1), context)
                             : p);
                         return a;
                     }, [e, event]);
-                    return fn.apply(context, _args);
+                    return fn_1.apply(context, _args);
                 };
                 return;
             }
@@ -42,12 +42,12 @@ function addEventListeners(container, handlers, context) {
             // on-publish
             // =============================================================
             if (index === 1) {
-                let topic = core_1.core.getValue(tokens[0], core_pub_sub_1.default);
+                var topic = core_1.core.getValue(tokens[0], core_pub_sub_1.default);
                 topic = topic === window ? tokens[0] : topic;
-                core_pub_sub_1.default.subscribe(topic, (message, data) => {
-                    let fnName = tokens[1];
+                core_pub_sub_1.default.subscribe(topic, function (message, data) {
+                    var fnName = tokens[1];
                     if (fnName) {
-                        let f = fn[fnName] ||
+                        var f = fn[fnName] ||
                             handlers[fnName] ||
                             core_1.core.getValue(fnName, context);
                         if (f)
@@ -80,23 +80,22 @@ function addEventListeners(container, handlers, context) {
             // on-change
             // ====================================================================
             if (index === 3) {
-                let select = e.tagName === 'SELECT';
+                var select = e.tagName === 'SELECT';
                 if (value === 'publish') {
                     if (select)
-                        e.onchange = () => core_pub_sub_1.default.publish(core_pub_sub_1.default.TOPICS.VALUE_CHANGE, e);
+                        e.onchange = function () { return core_pub_sub_1.default.publish(core_pub_sub_1.default.TOPICS.VALUE_CHANGE, e); };
                     else
-                        e.oninput = () => core_pub_sub_1.default.publish(core_pub_sub_1.default.TOPICS.VALUE_CHANGE, e);
+                        e.oninput = function () { return core_pub_sub_1.default.publish(core_pub_sub_1.default.TOPICS.VALUE_CHANGE, e); };
                     return;
                 }
-                let fn = handlers[value] ||
+                var fn_2 = handlers[value] ||
                     core_1.core.getValue(value, context);
                 if (select)
-                    e.onchange = () => fn.apply(context, [e]);
+                    e.onchange = function () { return fn_2.apply(context, [e]); };
                 else
-                    e.oninput = () => fn.apply(context, [e]);
+                    e.oninput = function () { return fn_2.apply(context, [e]); };
             }
         });
     });
 }
 exports.addEventListeners = addEventListeners;
-//# sourceMappingURL=core.declarative.js.map

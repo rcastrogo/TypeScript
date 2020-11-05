@@ -8,7 +8,6 @@ import {ajax} from './lib/core.ajax';
 import {Paginator, PaginationInfo} from './lib/core.paginator';
 import { DialogHelper } from './lib/core.dialogs';
 
-
 const ROWS_PER_PAGE = 4;
 
 export class ProveedoresPageComponent {
@@ -52,42 +51,32 @@ export class ProveedoresPageComponent {
         doAction : (sender:HTMLElement, event:MouseEvent, name:any, data:any) => {
           this.doAction({name, data });
         },
+        doGoToPage : (sender:HTMLInputElement, event:MouseEvent) => {
+          this.doAction({name: 'page', data : sender.value});
+        },
+        doSearch : (sender:HTMLInputElement, event:MouseEvent) => {
+          this.doAction({name: 'search', data : sender.value});
+        },
         doSort : (sender:HTMLElement, event:MouseEvent) => {
           let __field = ['_id',
-                          '_nif',
-                          '_nombre',
-                          '_descripcion',
-                          '_fechaDeAlta'][(event.target as HTMLTableCellElement).cellIndex - 1];
+                         '_nif',
+                         '_nombre',
+                         '_descripcion',
+                         '_fechaDeAlta'][(event.target as HTMLTableCellElement).cellIndex - 1];
           this.doSort(__field);
         }
       }, {});
-    // (blur)="goToPage($event.target)" (keyup.enter)="goToPage($event.target)" 
-    // (blur)="search($event.target)" (keyup.enter)="search($event.target)"
-    
-    //this.sendAction( {page, data : __page})
-    //this.sendAction( {search, data : sender.value});  
-
-
-
   }
-
-
-  //async function f(): Promise<string> {
-  //  return new Promise((resolve) => {
-  //    setTimeout(() => {
-  //      resolve("returned from f after a second");
-  //    }, 1000);
-  //  });
-  //}
-
-  //async function main() {
-  //  const results = await Promise.all(_.times(3, f));
-  //  console.log(results);
-  //}
 
   // ============================================================================================
   // Carga de datos
   // ============================================================================================
+  //async loadData() {
+  //  var res = await ajax.get('js/data/proveedores.json') as string;
+  //  this._sortBy = '_nombre';
+  //  this.proveedores = JSON.parse(res).orderBy(this._sortBy);
+  //  this.goToPage('first');
+  //}
   loadData() {
     this.syncTitle();
     ajax.get('js/data/proveedores.json')
@@ -105,8 +94,10 @@ export class ProveedoresPageComponent {
     var __page = ~~page;
     if (page === 'current')  __page = this.paginationInfo.currentPage;
     if (page === 'first')    __page = 1;
-    if (page === 'previous') __page = this.paginationInfo.currentPage - 1;
-    if (page === 'next')     __page = this.paginationInfo.currentPage + 1;
+    if (page === 'previous') __page = Math.max(this.paginationInfo.currentPage - 1,
+                                               1);
+    if (page === 'next')     __page = Math.min(this.paginationInfo.totalPages, 
+                                               this.paginationInfo.currentPage + 1);
     if (page === 'last')     __page = this.paginationInfo.totalPages;
     this.paginationInfo = Paginator.paginate(this.proveedores, __page, ROWS_PER_PAGE, '');
     this.syncTable();
@@ -117,6 +108,12 @@ export class ProveedoresPageComponent {
     this._tbody.innerHTML = '';
     this._tbody.appendChild(this._tr_template.cloneNode(true));
     
+    (this.paginationInfo as any).fn = {
+      checked : (proveedor:any, b:HTMLInputElement) => { 
+        return proveedor.__checked ? 'checked' : '';
+      }
+    }
+
     addEventListeners( 
       fillTemplate(this._tbody, this.paginationInfo), 
       {

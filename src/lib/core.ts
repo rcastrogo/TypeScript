@@ -112,7 +112,7 @@ class Core implements CoreConstructor{
                 // Buscar la propiedad en un ambito superior si existe
                 // =====================================================
                 if (value === undefined && a.outerScope) {
-                  value = this.getValue(name, a.outerScope);
+                  value = core.getValue(name, a.outerScope);
                 }
                 // =====================================================
                 // Existe el valor. Se le aplica el prototipo si procede

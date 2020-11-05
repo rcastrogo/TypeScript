@@ -12,12 +12,12 @@
 
     <button on-click="doAction:last" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10095;&#10095;</button>
     <button on-click="doAction:next" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10095;</button>
-    <input xbind="value:currentPage" class="w3-right w3-center" style="width: 3em;padding:8px; border:none" />
+    <input on-change="doGoToPage" xbind="value:currentPage" class="w3-right w3-center" style="width: 3em;padding:8px; border:none" />
     <button on-click="doAction:previous" class="w3-button w3-right w3-border-left w3-border-right" style="padding: 8px;">&#10094;</button>
     <button on-click="doAction:first" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10094;&#10094;</button>
 
     <div class="w3-right w3-border-left" style="margin:0; padding:0">
-      <input type="text" class="w3-right" style="padding:8px; border:none" placeholder="Buscar.." /> 
+      <input on-change="doSearch" type="text" class="w3-right" style="padding:8px; border:none" placeholder="Buscar.." /> 
     </div>
 
   </div>
@@ -36,7 +36,7 @@
     <tbody>
       <tr xbind xfor="proveedor in this.visibleItems" id="row-{proveedor._id}">
         <td xbind class="w3-border-right">
-          <input xbind type="checkbox" on-click="doAction:check-item:{index}" />
+          <input xbind="checked:fn.checked=>@proveedor" type="checkbox" on-click="doAction:check-item:{index}" />
         </td>
         <td xbind on-click="doAction:edit-row:{proveedor._id}">{proveedor._id}</td>
         <td xbind>{proveedor._nif}</td>

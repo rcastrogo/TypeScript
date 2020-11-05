@@ -2,16 +2,18 @@
 // ts-nocheck
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.core = void 0;
-class Core {
-    isNull(v) { return v === null; }
-    toArray(v) { return Array.from(v); }
-    isArray(v) { return Array.isArray(v); }
-    isString(v) { return typeof v == 'string'; }
-    isBoolean(v) { return typeof v == 'boolean'; }
-    isNumber(v) { return typeof v == 'number'; }
-    isFunction(v) { return typeof v == 'function'; }
-    isObject(v) { return v && typeof v == 'object'; }
-    apply(a, b, d) {
+var Core = /** @class */ (function () {
+    function Core() {
+    }
+    Core.prototype.isNull = function (v) { return v === null; };
+    Core.prototype.toArray = function (v) { return Array.from(v); };
+    Core.prototype.isArray = function (v) { return Array.isArray(v); };
+    Core.prototype.isString = function (v) { return typeof v == 'string'; };
+    Core.prototype.isBoolean = function (v) { return typeof v == 'boolean'; };
+    Core.prototype.isNumber = function (v) { return typeof v == 'number'; };
+    Core.prototype.isFunction = function (v) { return typeof v == 'function'; };
+    Core.prototype.isObject = function (v) { return v && typeof v == 'object'; };
+    Core.prototype.apply = function (a, b, d) {
         if (d)
             this.apply(a, d);
         if (a && b && this.isObject(b)) {
@@ -28,35 +30,36 @@ class Core {
             }
         }
         return a;
-    }
+    };
     ;
-    clone(o) {
+    Core.prototype.clone = function (o) {
+        var _this = this;
         if (this.isArray(o))
             return o.slice(0);
         if (this.isObject(o) && o.clone)
             return o.clone();
         if (this.isObject(o)) {
             return Object.keys(o)
-                .reduce((a, k) => {
-                a[k] = this.clone(o[k]);
+                .reduce(function (a, k) {
+                a[k] = _this.clone(o[k]);
                 return a;
             }, {});
         }
         return o;
-    }
-    join(items, property, separator) {
-        return items.reduce((a, o) => { return a.append(o[property || 'id']); }, [])
+    };
+    Core.prototype.join = function (items, property, separator) {
+        return items.reduce(function (a, o) { return a.append(o[property || 'id']); }, [])
             .join(separator === undefined ? '-' : (separator || ''));
-    }
-    createStringBuilder(s) {
+    };
+    Core.prototype.createStringBuilder = function (s) {
         return { value: s || '', append: function (s) { this.value = this.value + s; return this; },
             appendLine: function (s) { this.value = this.value + (s || '') + '\n'; return this; } };
-    }
-    $(e, control) {
+    };
+    Core.prototype.$ = function (e, control) {
         var __element = document.getElementById(e);
         if (__element)
             return __element;
-        let __targets;
+        var __targets;
         if (control)
             __targets = control.querySelectorAll(e);
         else
@@ -64,24 +67,24 @@ class Core {
         if (__targets.length)
             return __targets.toArray();
         return null;
-    }
+    };
     ;
-    build(tagName, options, firstElementChild) {
-        let o = this.isString(options) ? { innerHTML: options } : options;
-        let e = this.apply(document.createElement(tagName), o);
+    Core.prototype.build = function (tagName, options, firstElementChild) {
+        var o = this.isString(options) ? { innerHTML: options } : options;
+        var e = this.apply(document.createElement(tagName), o);
         return firstElementChild ? e.firstElementChild : e;
-    }
+    };
     ;
-    parseQueryString() {
+    Core.prototype.parseQueryString = function () {
         return location.search
             .slice(1)
-            .split('&').reduce((o, a) => {
+            .split('&').reduce(function (o, a) {
             o[a.split('=')[0]] = a.split('=')[1] || '';
             return o;
         }, {});
-    }
+    };
     ;
-    config(name) {
+    Core.prototype.config = function (name) {
         var __instance = {
             write: function (key, value) {
                 localStorage.setItem('{0}.{1}'.format(name, key), value);
@@ -92,26 +95,26 @@ class Core {
             }
         };
         return __instance;
-    }
-    getValue(key, scope) {
+    };
+    Core.prototype.getValue = function (key, scope) {
         return key.split(/\.|\[|\]/)
             .reduce(function (a, b) {
             if (b === '')
                 return a;
             if (b === 'this')
                 return a;
-            let name = b;
+            var name = b;
             // =====================================================
             // Prototype libro.name|htmlDecode,p1,p2,...
             // =====================================================
-            let apply_proto = b.indexOf('|') > -1;
-            let arg = [];
+            var apply_proto = b.indexOf('|') > -1;
+            var arg = [];
             if (apply_proto) {
-                let tokens = String.trimValues(b.split('|'));
+                var tokens = String.trimValues(b.split('|'));
                 name = tokens[0];
                 arg = String.trimValues(tokens[1].split(','));
             }
-            let value = a[name];
+            var value = a[name];
             // =====================================================
             // Buscar la propiedad en un ambito superior si existe
             // =====================================================
@@ -131,8 +134,9 @@ class Core {
             // =====================================================
             return a === self ? '' : self;
         }, scope || self);
-    }
-}
+    };
+    return Core;
+}());
 exports.core = new Core();
 String.leftPad = function (val, size, ch) {
     var result = '' + val;
@@ -143,12 +147,16 @@ String.leftPad = function (val, size, ch) {
     return result;
 };
 String.trimValues = function (values) {
-    return values.map(s => s.trim());
+    return values.map(function (s) { return s.trim(); });
 };
 // =================================================================================================
 // Strings.prototype
 // =================================================================================================
-String.prototype.format = function (...values) {
+String.prototype.format = function () {
+    var values = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        values[_i] = arguments[_i];
+    }
     var __context = values[values.length - 1] || self;
     var __call_fn = function (fn, params, base) {
         var _args = String.trimValues(params)
@@ -160,16 +168,16 @@ String.prototype.format = function (...values) {
         return fn.apply(__context, _args);
     };
     return this.replace(/\{(\d+|[^{]+)\}/g, function (m, k) {
-        let [key, fnName] = String.trimValues(k.split(':'));
-        let value;
+        var _a = String.trimValues(k.split(':')), key = _a[0], fnName = _a[1];
+        var value;
         if (/^\d+/.test(key)) {
-            let tokens = String.trimValues(key.split('|'));
-            let index = ~~tokens[0];
-            let name = tokens.length == 0 ? 'data'
+            var tokens = String.trimValues(key.split('|'));
+            var index = ~~tokens[0];
+            var name_1 = tokens.length == 0 ? 'data'
                 : ['data'].concat(tokens.slice(1))
                     .join('|');
-            let scope = { data: values[index], outerScope: __context };
-            value = exports.core.getValue(name, scope);
+            var scope = { data: values[index], outerScope: __context };
+            value = exports.core.getValue(name_1, scope);
         }
         else {
             value = exports.core.getValue(key, __context);
@@ -183,8 +191,8 @@ String.prototype.format = function (...values) {
         // Data.toUpper(value, scope.Other, 'A', '5')
         // name:Data.toUpper=>@Other;A;5
         if (fnName) {
-            let [name, params] = String.trimValues(fnName.split(/=>/));
-            return __call_fn(exports.core.getValue(name, __context), params ? params.split(/\s|\;/) : [], [value]);
+            var _b = String.trimValues(fnName.split(/=>/)), name_2 = _b[0], params = _b[1];
+            return __call_fn(exports.core.getValue(name_2, __context), params ? params.split(/\s|\;/) : [], [value]);
         }
         return value;
     });
@@ -237,7 +245,7 @@ Array.prototype.select = function (sentence) {
         : this.map(sentence);
 };
 Array.prototype.item = function (propName, value, def) {
-    return this.filter((v) => {
+    return this.filter(function (v) {
         return v[propName] == value;
     })[0] || def;
 };
@@ -298,11 +306,12 @@ Array.prototype.orderBy = function (sentence) {
         return ((x < y) ? -1 : ((x > y) ? 1 : 0));
     });
 };
-Array.prototype.distinct = function (sentence = '') {
+Array.prototype.distinct = function (sentence) {
+    if (sentence === void 0) { sentence = ''; }
     var __sentence = exports.core.isString(sentence) ? function (a) { return sentence ? a[sentence] : a; }
         : sentence;
     var r = [];
-    this.forEach((item) => {
+    this.forEach(function (item) {
         var _value = __sentence(item);
         if (r.indexOf(_value) == -1)
             r.push(_value);
@@ -342,4 +351,3 @@ Array.prototype.toDictionary = function (prop, value) {
 NodeList.prototype.toArray = function () {
     return Array.from(this);
 };
-//# sourceMappingURL=core.js.map

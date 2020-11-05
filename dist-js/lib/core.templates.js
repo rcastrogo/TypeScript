@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fillTemplate = exports.executeTemplate = exports.merge = void 0;
-const core_1 = require("./core");
+var tslib_1 = require("tslib");
+var core_1 = require("./core");
 function __getValue(key, scope, def) {
-    let v = core_1.core.getValue(key, scope);
+    var v = core_1.core.getValue(key, scope);
     return v == window ? def : v;
 }
 function merge(template, o, HTMLElemnt) {
@@ -20,14 +21,14 @@ function merge(template, o, HTMLElemnt) {
     };
     var __result = template.replace(/{([^{]+)?}/g, function (m, key) {
         if (key.indexOf(':') > 0) {
-            let tokens = String.trimValues(key.split(':'));
-            let value = core_1.core.getValue(tokens[0], o);
-            let [name, params] = String.trimValues(tokens[1].split(/=>/));
-            let _params = params ? String.trimValues(params.split(/\s|\;/))
+            var tokens = String.trimValues(key.split(':'));
+            var value_1 = core_1.core.getValue(tokens[0], o);
+            var _a = String.trimValues(tokens[1].split(/=>/)), name_1 = _a[0], params_1 = _a[1];
+            var _params = params_1 ? String.trimValues(params_1.split(/\s|\;/))
                 : [];
-            return __call_fn(core_1.core.getValue(name, o), _params, [value]);
+            return __call_fn(core_1.core.getValue(name_1, o), _params, [value_1]);
         }
-        let [name, params] = String.trimValues(key.split(/=>/));
+        var _b = String.trimValues(key.split(/=>/)), name = _b[0], params = _b[1];
         var value = core_1.core.getValue(name, o);
         if (core_1.core.isFunction(value))
             return __call_fn(value, params.split(/\s|\;/), []);
@@ -44,12 +45,12 @@ function fillTemplate(e, scope) {
     // ==============================================================================
     var _repeaters = _root.querySelectorAll('[xfor]')
         .toArray();
-    var _repeatersElements = _repeaters.reduce((a, r) => {
+    var _repeatersElements = _repeaters.reduce(function (a, r) {
         return a.concat(core_1.core.$('[xbind]', r));
-    }, [..._repeaters]);
+    }, tslib_1.__spreadArrays(_repeaters));
     var _elements = _root.querySelectorAll('[xbind]')
         .toArray()
-        .filter(x => !_repeatersElements.includes(x));
+        .filter(function (x) { return !_repeatersElements.includes(x); });
     if (_root.attributes.getNamedItem('xbind'))
         _elements.push(_root);
     // ==============================================================================
@@ -60,7 +61,7 @@ function fillTemplate(e, scope) {
         // Visibilidad del elemento. Ej: xif="index"
         // ============================================================================
         if (child.attributes.getNamedItem('xif')) {
-            let fn = new Function('ctx', 'return {0};'.format(child.attributes
+            var fn = new Function('ctx', 'return {0};'.format(child.attributes
                 .getNamedItem('xif')
                 .value)
                 .replaceAll('@', 'this.'));
@@ -71,14 +72,14 @@ function fillTemplate(e, scope) {
         // ============================================================================
         core_1.core.toArray(child.attributes)
             .where({ value: /{[^{]+?}/g })
-            .map(a => a.value = merge(a.value, scope));
+            .map(function (a) { return a.value = merge(a.value, scope); });
         // ============================================================================
         // Nodos texto de este elemento
         // ============================================================================
         core_1.core.toArray(child.childNodes)
             .where({ nodeType: 3 })
             .where({ textContent: /{[^{]+?}/g })
-            .forEach(text => text.textContent = merge(text.textContent, scope, text));
+            .forEach(function (text) { return text.textContent = merge(text.textContent, scope, text); });
         // ============================================================================
         // Propiedades que establecer
         // ============================================================================
@@ -89,8 +90,8 @@ function fillTemplate(e, scope) {
             .forEach(function (token) {
             if (token === '')
                 return;
-            let [name, params] = String.trimValues(token.split(':'));
-            let [prop_name, _params] = String.trimValues(params.split(/=>/));
+            var _a = String.trimValues(token.split(':')), name = _a[0], params = _a[1];
+            var _b = String.trimValues(params.split(/=>/)), prop_name = _b[0], _params = _b[1];
             var _value = core_1.core.getValue(prop_name, scope);
             // ==========================================================================
             // _value es una funci�n de transformaci�n:
@@ -114,23 +115,23 @@ function fillTemplate(e, scope) {
     // ====================================================================
     // Procesado de los repeaters
     // ====================================================================
-    _repeaters.map(repeater => {
-        let [itemName, propname] = String.trimValues(repeater.attributes
+    _repeaters.map(function (repeater) {
+        var _a = String.trimValues(repeater.attributes
             .getNamedItem('xfor')
             .value
-            .split(' in '));
-        let data = core_1.core.getValue(propname, scope);
+            .split(' in ')), itemName = _a[0], propname = _a[1];
+        var data = core_1.core.getValue(propname, scope);
         if (data && data != window) {
-            data.map((d, i) => {
-                let __scope = { index: i,
+            data.map(function (d, i) {
+                var __scope = { index: i,
                     outerScope: scope };
                 __scope[itemName] = core_1.core.clone(d);
-                let node = fillTemplate(repeater.cloneNode(true), __scope);
+                var node = fillTemplate(repeater.cloneNode(true), __scope);
                 repeater.parentNode.insertBefore(node, repeater);
             });
         }
         return repeater;
-    }).forEach(repeater => repeater.parentNode.removeChild(repeater));
+    }).forEach(function (repeater) { return repeater.parentNode.removeChild(repeater); });
     return e;
 }
 exports.fillTemplate = fillTemplate;
@@ -147,4 +148,3 @@ function executeTemplate(e, values, dom) {
     return dom ? _result.nodes : _result.html.join('');
 }
 exports.executeTemplate = executeTemplate;
-//# sourceMappingURL=core.templates.js.map

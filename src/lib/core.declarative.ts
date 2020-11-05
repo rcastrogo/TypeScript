@@ -92,7 +92,8 @@ function addEventListeners(container:HTMLElement, handlers:any, context:any) {
              if (select) 
                e.onchange = () => fn.apply(context, [e]);
              else 
-               e.oninput  = () => fn.apply(context, [e]);
+               e.oninput = () => fn.apply(context, [e]);
+               e.onblur  = () => fn.apply(context, [e]);
            }
        }); 
   });

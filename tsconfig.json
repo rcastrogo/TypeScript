@@ -8,7 +8,7 @@
     "sourceMap": false,
     "removeComments": false,
     "noUnusedLocals": false,
-    "target": "ES6",
+    "target": "ES6", // Para UglifyJS  "ES5"
     "typeRoots": [
       "node_modules/@types"
     ],

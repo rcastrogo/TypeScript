@@ -1,11 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DialogHelper = void 0;
-class DialogHelper {
-    constructor() { }
-    static getWrapper(id) {
-        let __container = document.getElementById(id);
-        let __dlg = { container: __container, title: __container.querySelector('.js-title'),
+var DialogHelper = /** @class */ (function () {
+    function DialogHelper() {
+    }
+    DialogHelper.getWrapper = function (id) {
+        var __container = document.getElementById(id);
+        var __dlg = { container: __container, title: __container.querySelector('.js-title'),
             body: __container.querySelector('.js-content'),
             closeButton: __container.querySelector('.js-close-button'),
             acceptButton: __container.querySelector('.js-accept-button'), close: function () {
@@ -13,7 +14,7 @@ class DialogHelper {
                 return __dlg;
             }, show: function (onConfirm) {
                 if (onConfirm) {
-                    __dlg.acceptButton.onclick = () => {
+                    __dlg.acceptButton.onclick = function () {
                         onConfirm(__dlg);
                     };
                 }
@@ -25,11 +26,11 @@ class DialogHelper {
                     onInit(__dlg);
                 return __dlg;
             },
-            setTitle: (title) => {
+            setTitle: function (title) {
                 __dlg.title.innerHTML = title;
                 return __dlg;
             },
-            setBody: (content) => {
+            setBody: function (content) {
                 if (content.tagName) {
                     __dlg.body.innerHTML = '';
                     __dlg.body.appendChild(content);
@@ -38,16 +39,18 @@ class DialogHelper {
                     __dlg.body.innerHTML = content;
                 }
                 return __dlg;
-            }, disableClickOutside: () => {
-                __dlg.container.onclick = () => { };
+            },
+            disableClickOutside: function () {
+                __dlg.container.onclick = function () { };
                 return __dlg;
-            } };
+            }
+        };
         __dlg.acceptButton.onclick = __dlg.close;
         __dlg.closeButton.onclick = __dlg.close;
-        __dlg.container.onclick = (sender) => { if (sender.target === __dlg.container)
+        __dlg.container.onclick = function (sender) { if (sender.target === __dlg.container)
             __dlg.close(); };
         return __dlg;
-    }
-}
+    };
+    return DialogHelper;
+}());
 exports.DialogHelper = DialogHelper;
-//# sourceMappingURL=core.dialogs.js.map
