@@ -2,16 +2,22 @@
   "compilerOptions": {
     "outDir": "./dist-js/",
     "noImplicitAny": true,
-    "module": "es6",
+    "module": "CommonJS", 
+    "importHelpers": true,
     "moduleResolution": "node",
-    "sourceMap": true,
-    "target": "es6",
+    "sourceMap": false,
+    "removeComments": false,
+    "noUnusedLocals": false,
+    "target": "ES6",
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
-      "es2017",
+      "ES2017",
       "dom"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules"
+  ]
 }

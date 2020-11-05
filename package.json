@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --mode production",
-    "start": "webpack-dev-server --mode development --hot"
+    "start": "webpack-dev-server --mode development --hot",
+    "build-api": "browserify ./dist-js/lib/api.js --standalone pol > ./dist-js/lib/pol.bundle.js",
+    "compile": "tsc -p ./tsconfig.json"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.5.0",

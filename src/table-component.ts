@@ -71,6 +71,20 @@ export class ProveedoresPageComponent {
 
   }
 
+
+  //async function f(): Promise<string> {
+  //  return new Promise((resolve) => {
+  //    setTimeout(() => {
+  //      resolve("returned from f after a second");
+  //    }, 1000);
+  //  });
+  //}
+
+  //async function main() {
+  //  const results = await Promise.all(_.times(3, f));
+  //  console.log(results);
+  //}
+
   // ============================================================================================
   // Carga de datos
   // ============================================================================================

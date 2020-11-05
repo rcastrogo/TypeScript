@@ -20,6 +20,8 @@ import include from './lib/core.include';
 
 function render() {
 
+  console.log(HTML);
+
   document.getElementById('app-content')
           .innerHTML = HTML;
 
