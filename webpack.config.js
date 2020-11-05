@@ -25,8 +25,8 @@ module.exports = (env, options) => {
 				hash: false,
 				template: './src/index.html',
 				templateParameters: {
-					title   : 'ts-app',
-					baseHref : isDevelopment ? '/' : '/ts-app/',
+					title   : 'TypeScript',
+					baseHref : isDevelopment ? '/' : '/TypeScript/',
 				}
 		  }),
 		  new HtmlWebpackPlugin({
@@ -34,8 +34,8 @@ module.exports = (env, options) => {
 				filename: '404.html',
 				template: './src/index.html',
 				templateParameters: {
-					title   : 'ts-app',
-					baseHref : '/ts-app/',
+					title   : 'TypeScript',
+					baseHref : '/TypeScript/',
 				}
 		  })
 		],
