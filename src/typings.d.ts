@@ -88,5 +88,3 @@ interface NodeListOf<TNode extends Node> extends NodeList {
 interface NodeList{
   toArray():Array<unknown>;
 }
-
-

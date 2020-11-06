@@ -1,12 +1,11 @@
 ﻿
+import { core } from '../../lib/core';
+import { ajax } from '../../lib/core.ajax';
+import { addEventListeners } from '../../lib/core.declarative';
+import { DialogHelper } from '../../lib/core.dialogs';
+import { PaginationInfo, Paginator } from '../../lib/core.paginator';
+import { fillTemplate } from '../../lib/core.templates';
 import HTML from './table-component.ts.html';
-import pubSub from './lib/core.pub-sub';
-import {addEventListeners} from './lib/core.declarative';
-import {core} from './lib/core';
-import {fillTemplate} from './lib/core.templates';
-import {ajax} from './lib/core.ajax';
-import {Paginator, PaginationInfo} from './lib/core.paginator';
-import { DialogHelper } from './lib/core.dialogs';
 
 const ROWS_PER_PAGE = 4;
 
@@ -26,8 +25,6 @@ export class ProveedoresPageComponent {
     this.proveedores = [];
     this.paginationInfo = Paginator.paginate(this.proveedores, 1, ROWS_PER_PAGE, '');
     this.paginationInfo.title = 'Proveedores: Cargando datos...';
-    this.init();
-    this.loadData();
   }
 
   // ============================================================================================
@@ -36,18 +33,17 @@ export class ProveedoresPageComponent {
   private _tbody:HTMLElement;
   private _tr_template:HTMLElement;
   private _header:HTMLElement;
-  init() {
-    let __container = core.build('div', { innerHTML : HTML}, true);
-    document.getElementById('app-content').innerHTML = '';
-    document.getElementById('app-content').appendChild(__container);
+  renderTo(container:HTMLElement):ProveedoresPageComponent {
 
-    this._header = __container.querySelector('[header]');
-    this._tbody  = __container.querySelector<HTMLTableElement>('table tbody');
-    this._tr_template = __container.querySelector<HTMLTableElement>('table tbody tr');
+    container.appendChild(core.build('div', { innerHTML : HTML}, true));
+
+    this._header = container.querySelector('[header]');
+    this._tbody  = container.querySelector<HTMLTableElement>('table tbody');
+    this._tr_template = container.querySelector<HTMLTableElement>('table tbody tr');
     this._tbody.removeChild(this._tr_template);
 
     addEventListeners( 
-      __container, {
+      container, {
         doAction : (sender:HTMLElement, event:MouseEvent, name:any, data:any) => {
           this.doAction({name, data });
         },
@@ -66,6 +62,7 @@ export class ProveedoresPageComponent {
           this.doSort(__field);
         }
       }, {});
+    return this;
   }
 
   // ============================================================================================
