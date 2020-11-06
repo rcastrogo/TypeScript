@@ -45,12 +45,12 @@ export class TabblyReportsJsView {
     // =========================================================================
     // Cargar el informe
     // =========================================================================
-    include('../../js/pro-0001.js').then((cancel:Function) => {
+    include('./js/pro-0001.js').then((cancel:Function) => {
       var __rd = (window as any).__reportDefinition(loader, core);
       // =======================================================================
       // Cargar los datos
       // =======================================================================
-      ajax.get('../../js/data/proveedores.json')
+      ajax.get('./js/data/proveedores.json')
           .then((res:string) => {
             __handler.clear()
             new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);

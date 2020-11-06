@@ -46,13 +46,13 @@ export class TabblyReportsV2View {
     // =============================================================================
     // Definición del informe
     // =============================================================================
-    ajax.get('../../js/pro-0001-v2.txt')
+    ajax.get('./js/pro-0001-v2.txt')
         .then((res:string) => {
           var __rd = loader.load(res);
           // =======================================================================
           // Datos del informe
           // =======================================================================
-          ajax.get('../../js/data/proveedores.json')
+          ajax.get('./js/data/proveedores.json')
               .then((res:string) => {
                 new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
                 target.append(core.build('div', { innerHTML : __handler.buffer }));
