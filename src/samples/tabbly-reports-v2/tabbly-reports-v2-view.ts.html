@@ -2,8 +2,93 @@
 
   <div class="w3-teal w3-center w3-padding">Informes V2</div>
 
-  <div class="w3-padding w3-margin w3-border" report-container style="overflow:auto; max-height:400px;">
+  <div class="w3-padding">
+    <p style="text-indent:1em;">
+      <h3>Listado</h3>
+      <ul>
+        <li>En esta versión el fichero se carga por medio de Ajax. Las funciones javaScript están definidas en el fichero de texto.</li>
+        <li>La generación del contenido se realiza por medio de <code class="w3-codespan">String.format(context)</code>.
+         <div class="w3-code jsHigh notranslate" 
+             style="overflow: auto;white-space: pre;">'{0|toFixed,2}'.format(55);
+'{0|toUpperCase}'.format('aaa');
+'{0|toUpperCase:format}'.format('aaa', { format(value){ return '->' + value; } });
+'{0:format}'.format('aaa', { format(value){ return '->' + value; } });
+'{0:format=>1;2}'.format('aaa', { format(value,a,b){ return '->' + value + a + b; } });
+'{format}'.format({ id : 55, format(){ return this.id; }});
+'{format:url;@window.location.href|toUpperCase b}'.format({ format(value, href, b){ return value + ' ' + href;}});
+'{id}'.format({ id : 55, format(){ return this.id; }});
+'{id|toFixed,3}'.format({ id : 55 });
+'{id|toFixed,3:format}'.format({ id : 55, format(v){ return v + ' €'; }});
+'{id:format=>@window.location.href|toUpperCase;b;c}'.format({ id : 55, format(v,a,b,c){ return v + ' €'; }});</div>
+        </li>
+        <li>Es posible especificar una plantilla o una función para crear el contenido <code class="w3-codespan">CREATE group key:_descripcion id:Group01_tipo headerValueProviderfn:BS.fn.header_provider_fn</code>.</li>
+        <li>Se pueden crear una o más secciones de cabecera y de resumen del informe.</li>
+        <li>Se pueden crear una o más secciones de detalle.</li>
+        <li>Se pueden crear agrupaciones y dentro de estas indicar una cabecera y pie de grupo.</li>
+      </ul>
+    </p>
+    <div class="w3-padding w3-border" report-container style="overflow:auto; max-height:400px;">
 
+    </div>
+  </div>
+
+  <div class="w3-padding">
+    <p style="text-indent:1em;">
+      <h3>Código JavaScript</h3>
+      <div class="w3-code jsHigh notranslate" 
+           style="overflow: auto;white-space: pre; height:200px">import { ReportEngine } from '../../lib/core.tabbly.v2.engine';
+import { loader } from '../../lib/core.tabbly.v2.loader';
+
+private __loadReport(target:HTMLElement){
+    
+    /* ==========================================================================
+    // Receptor de mensajes
+    // ========================================================================*/
+    var __handler = { 
+      buffer  : '' ,
+      send    : function(data:string){ this.buffer += data; },
+      message : function(message:any){ 
+        /*console.log(message);*/ 
+      },
+      flush   : function(){ },
+      clear   : function(){ this.buffer = ''; }
+    };
+
+    /* =============================================================================
+    // Definición del informe
+    // ===========================================================================*/
+    ajax.get('./js/pro-0001-v2.txt')
+        .then((res:string) => {
+          var __rd = loader.load(res);
+          /* =======================================================================
+          // Datos del informe
+          // =====================================================================*/
+          ajax.get('./js/data/proveedores.json')
+              .then((res:string) => {
+                new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
+                target.append(core.build('div', { innerHTML : __handler.buffer }));
+
+                addEventListeners(target, {}, __rd.getContext());            
+              });                          
+        });      
+}</div>
+    </p>
+
+    <div class="w3-half w3-padding">
+      <h3>Definición del informe</h3>
+      <div class="w3-code w3-border" 
+           style="overflow: auto;white-space: pre;" 
+           on-publish="msg/rpt/definition:innerText">
+      </div>
+    </div>
+
+    <div class="w3-half w3-padding">
+      <h3>Datos del ejemplo</h3>
+      <div class="w3-code w3-border jsHigh notranslate" 
+           style="overflow: auto;white-space: pre;" 
+           on-publish="msg/rpt/data:innerText">
+      </div>
+    </div>
   </div>
 
 </div>

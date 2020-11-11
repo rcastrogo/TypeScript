@@ -5,6 +5,7 @@ import { addEventListeners } from '../../lib/core.declarative';
 import { DialogHelper } from '../../lib/core.dialogs';
 import { PaginationInfo, Paginator } from '../../lib/core.paginator';
 import { fillTemplate } from '../../lib/core.templates';
+import pubSub from '../../lib/core.pub-sub';
 import HTML from './table-component.ts.html';
 
 const ROWS_PER_PAGE = 4;
@@ -39,6 +40,7 @@ export class ProveedoresPageComponent {
 
     this._header = container.querySelector('[header]');
     this._tbody  = container.querySelector<HTMLTableElement>('table tbody');
+    pubSub.publish('msg/table/template', this._tbody.parentElement.outerHTML);
     this._tr_template = container.querySelector<HTMLTableElement>('table tbody tr');
     this._tbody.removeChild(this._tr_template);
 
@@ -80,22 +82,22 @@ export class ProveedoresPageComponent {
         .then((res:string) => {       
           this._sortBy = '_nombre';
           this.proveedores = JSON.parse(res).orderBy(this._sortBy);
+          pubSub.publish('msg/table/data', JSON.stringify(this.proveedores, null, 2));
           this.goToPage('first');
         });
   }
 
-  // ============================================================================================
+  // =====================================================================================
   // Paginación
-  // ============================================================================================
+  // =====================================================================================
   goToPage(page: string) {
     var __page = ~~page;
     if (page === 'current')  __page = this.paginationInfo.currentPage;
     if (page === 'first')    __page = 1;
-    if (page === 'previous') __page = Math.max(this.paginationInfo.currentPage - 1,
-                                               1);
+    if (page === 'last')     __page = this.paginationInfo.totalPages;
+    if (page === 'previous') __page = Math.max(this.paginationInfo.currentPage - 1, 1);
     if (page === 'next')     __page = Math.min(this.paginationInfo.totalPages, 
                                                this.paginationInfo.currentPage + 1);
-    if (page === 'last')     __page = this.paginationInfo.totalPages;
     this.paginationInfo = Paginator.paginate(this.proveedores, __page, ROWS_PER_PAGE, '');
     this.syncTable();
   }

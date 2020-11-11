@@ -2,7 +2,105 @@
 
   <div class="w3-teal w3-center w3-padding">Edición de entidades</div>
 
-  <div class="w3-padding" table-container>
+  <div class="w3-padding">
+    <p style="text-indent:1em;">
+      <h3>Página de edición de entidades</h3>
+      Ejemplo de una página para la edición de entidades. Se utiliza FillTemplate para la generación de la tabla.
+    </p>
+    <div class="w3-padding w3-border" table-container>
+
+    </div>
+  </div>
+
+  <div class="w3-padding">
+
+    <div class="w3-half w3-padding">
+      <h3>Código JavaScript</h3>
+      <div class="w3-code w3-border js notranslate" 
+           style="overflow: auto;white-space: pre;" >/* ==========================================================================
+// Manejadores de eventos de los botones de navegación
+// ========================================================================*/        
+addEventListeners( 
+  container, {
+    doAction : (sender:HTMLElement, event:MouseEvent, name:any, data:any) => {
+      this.doAction({name, data });
+    },
+    doGoToPage : (sender:HTMLInputElement, event:MouseEvent) => {
+      this.doAction({name: 'page', data : sender.value});
+    },
+    doSearch : (sender:HTMLInputElement, event:MouseEvent) => {
+      this.doAction({name: 'search', data : sender.value});
+    },
+    doSort : (sender:HTMLElement, event:MouseEvent) => {
+      let __field = ['_id',
+                     '_nif',
+                     '_nombre',
+                     '_descripcion',
+                     '_fechaDeAlta'][(event.target as HTMLTableCellElement).cellIndex - 1];
+      this.doSort(__field);
+    }
+  }, {});
+
+/* ==========================================================================
+// Generación de la tabla
+// ========================================================================*/
+syncTable() {
+  this.syncTitle();
+  this._tbody.innerHTML = '';
+  this._tbody.appendChild(this._tr_template.cloneNode(true));
+    
+  (this.paginationInfo as any).fn = {
+    checked : (proveedor:any, b:HTMLInputElement) => { 
+      return proveedor.__checked ? 'checked' : '';
+    }
+  }
+
+  addEventListeners( 
+    fillTemplate(this._tbody, this.paginationInfo), 
+    {
+      doAction : (sender:HTMLElement, event:MouseEvent, name:any, data:any) => {
+        this.doAction({name, data });
+      },
+      doAddToFavorites: (sender: HTMLButtonElement, event:MouseEvent, name:any, data:any) => {
+        console.log('Current -> Id : {_id}, Nif : {_nif}'.merge(this.proveedores[0])); 
+        console.log(this.proveedores.select('_id'));
+        console.log('Add to favorites {0}, {1}'.format(1, 2));
+      }
+    }, {});
+}
+
+/* ==========================================================================
+// Actualización de la cabecera de la tabla
+// ========================================================================*/
+syncTitle() {
+  let __total      = this.paginationInfo.totalItems
+  let __selected   = this.paginationInfo.getChecked().length;
+  let __template   = 'Proveedores: {0} elementos'.format(__total);
+  let __template_s = ' ({0} seleccionados)'.format(__selected);
+  if (__selected) {
+    this.paginationInfo.title = __template + __template_s;
+  } else {
+    this.paginationInfo.title = __template;
+  }
+  fillTemplate(this._header, this.paginationInfo);
+}</div>
+    </div>
+
+    <div class="w3-half w3-padding">
+      <h3>Plantilla de transformación</h3>
+      <div class="w3-code w3-border" 
+           style="overflow: auto;white-space: pre;" 
+           on-publish="msg/table/template:innerText:html">
+      </div>
+    </div>
+
+    <div class="w3-half w3-padding">
+      <h3>Datos del ejemplo</h3>
+      <div class="w3-code w3-border jsHigh notranslate" 
+           style="overflow: auto;white-space: pre;" 
+           on-publish="msg/table/data:innerText:js">
+      </div>
+    </div>
 
   </div>
 

@@ -1,10 +1,10 @@
 ﻿
-import HTML from './pub-sub-view.ts.html';
-import { core } from '../../lib/core';
-import pubSub from '../../lib/core.pub-sub';
-import { addEventListeners } from '../../lib/core.declarative';
-import { Command, CommandManager } from '../../lib/core.commands';
 import { Constants } from '../../app.constants';
+import { core } from '../../lib/core';
+import { addEventListeners } from '../../lib/core.declarative';
+import pubSub from '../../lib/core.pub-sub';
+import HTML from './pub-sub-view.ts.html';
+import include from '../../lib/core.include';
 
 export class PubSubView {
 
@@ -26,13 +26,24 @@ export class PubSubView {
     addEventListeners(target, {
       doPublish : function(){
         pubSub.publish(pubSub.TOPICS.NOTIFICATION, 'Botón doPublish'); 
-          setTimeout( function(){
-            pubSub.publish(pubSub.TOPICS.NOTIFICATION, ''); 
-          }, 2000);
-        }
+        setTimeout( function(){
+          pubSub.publish(pubSub.TOPICS.NOTIFICATION, ''); 
+        }, 2000);
+      }
     },{});
+
+    include('./js/w3codecolor.js')
+      .then(() => this.__colorize());
   }
  
+  private __colorize() {
+    this._content
+        .querySelectorAll<Element>('.jsHigh,.htmlHigh')
+        .toArray()
+        .map( e => ({ e : e, mode : e.classList.contains('jsHigh') ? 'js' : 'html' }))
+        .forEach( e => e.e.innerHTML = w3CodeColorize(e.e.innerHTML, e.mode));   
+  }
+
 }
 
 

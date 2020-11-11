@@ -4,6 +4,7 @@ import { core} from '../../lib/core';
 import { addEventListeners } from '../../lib/core.declarative';
 import { Command, CommandManager } from '../../lib/core.commands';
 import { Constants } from '../../app.constants';
+import include from '../../lib/core.include';
 
 export class CommandsView {
 
@@ -28,19 +29,31 @@ export class CommandsView {
     target.appendChild(this._content);
     addEventListeners(target, {
       doCommand : () => {
-
-        console.log(this._document.name);
+        this._document.name = 'Valor inicial';
+        let __container = this._content.querySelector<HTMLElement>('[message-container]');
+        __container.innerHTML = this._document.name + '<br/>';
         this._commandManager.executeCommad(ToUpperCaseCommand());
-        console.log(this._document.name);
+        __container.innerHTML += this._document.name + '<br/>';
         this._commandManager.undo();
-        console.log(this._document.name);
+        __container.innerHTML += this._document.name + '<br/>';
         this._commandManager.redo();
-        console.log(this._document.name);
+        __container.innerHTML += this._document.name + '<br/>';
         
       }
     },{});
+
+    include('./js/w3codecolor.js')
+      .then(() => this.__colorize());
   }
- 
+
+  private __colorize() {
+    this._content
+        .querySelectorAll<Element>('.jsHigh,.htmlHigh')
+        .toArray()
+        .map( e => ({ e : e, mode : e.classList.contains('jsHigh') ? 'js' : 'html' }))
+        .forEach( e => e.e.innerHTML = w3CodeColorize(e.e.innerHTML, e.mode));   
+  } 
+
 }
 
 function ToUpperCaseCommand(): Command {

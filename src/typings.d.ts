@@ -88,3 +88,7 @@ interface NodeListOf<TNode extends Node> extends NodeList {
 interface NodeList{
   toArray():Array<unknown>;
 }
+
+declare function w3CodeColor(): void;
+declare function w3CodeColorize(html:string, mode:string): string;
+declare function __reportDefinition(loader : { load : (value:string) => any }, core : CoreConstructor):any

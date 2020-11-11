@@ -50,7 +50,7 @@ function addEventListeners(container:HTMLElement, handlers:any, context:any) {
                  let f = fn[fnName]        ||
                          handlers[fnName]  || 
                          core.getValue(fnName, context);
-                 if (f) f.apply(context, [e, data]);
+                 if (f) f.apply(context, [e, data, ...tokens.slice(2)]);
                  return;
                }else{
                  fn.innerHTML(e, data);

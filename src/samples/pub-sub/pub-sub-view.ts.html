@@ -1,11 +1,29 @@
-﻿<div class="w3-container w3-padding">
+﻿<div>
 
-  <h1>Pub-Sub</h1>
+  <div class="w3-teal w3-center w3-padding">Pub-Sub</div>
 
-  <button on-click="doPublish">Test</button>
-	<div class="w3-container w3-padding" on-publish="TOPICS.NOTIFICATION:innerHTML">
+  <div class="w3-padding">
+
+    <p style="text-indent:1em;">
+      Ejemplo de uso del patrón Publisher/Subscriber.
+    </p>
+    <button on-click="doPublish">Publicar mensaje</button>
+	  <div class="w3-container w3-padding" on-publish="TOPICS.NOTIFICATION:innerHTML">
+    </div>
+
+    <p style="text-indent:1em;">
+      <h3>Código Js del ejemplo</h3>
+      <div class="w3-code jsHigh notranslate" style="overflow: auto;white-space: pre;">import pubSub from '../../lib/core.pub-sub';
+doPublish : function(){
+  pubSub.publish(pubSub.TOPICS.NOTIFICATION, 'Botón doPublish'); 
+  setTimeout( function(){
+    pubSub.publish(pubSub.TOPICS.NOTIFICATION, ''); 
+  }, 2000);
+}</div>
+      <h3>Html</h3>
+      <div class="w3-code htmlHigh notranslate" style="overflow: auto;white-space: pre;">&lt;div class="w3-container w3-padding" on-publish="TOPICS.NOTIFICATION:innerHTML"&gt;</div>
+    </p>
 
   </div>
-
 
 </div>

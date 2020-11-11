@@ -1,7 +1,7 @@
 ﻿
 
 DEFINE hideDetail         = false
-DEFINE hiddenHeaders      = 0
+DEFINE hiddenHeaders      = 1
 DEFINE repeatHeader       = 1
 DEFINE repeatHeaderAfter  = 0
 DEFINE tableId            = tbl-rpt0001
@@ -64,7 +64,7 @@ CREATE  detail id:@detailId
 ADD_COL xbind:'innerHTML:BS.data._id' on-click:'BS.fn.sayHello:@BS.recordCount:1:2'
 ADD_COL xbind:'innerHTML:BS.data._nif|toUpperCase'
 ADD_COL xbind:'innerHTML:BS.data._nombre|toUpperCase'
-ADD_COL xbind:'innerHTML:BS.fn.fixDate2 @BS.data._fechaDeAlta,abc,9'
+ADD_COL xbind:'innerHTML:BS.data._fechaDeAlta BS.fn.fixDate extraParams'
 ADD_COL xbind:'' id:'txt-{BS.data._id}' html:@__COL_5_INNERHTML
 
 # ===========================================================================================

@@ -1,12 +1,14 @@
 ﻿
-import HTML from './tabbly-reports-js-view.ts.html';
 import { Constants } from '../../app.constants';
 import { core } from '../../lib/core';
 import { ajax } from '../../lib/core.ajax';
 import { addEventListeners } from '../../lib/core.declarative';
+import include from '../../lib/core.include';
 import { ReportEngine } from '../../lib/core.tabbly.v2.engine';
 import { loader } from '../../lib/core.tabbly.v2.loader';
-import include from '../../lib/core.include';
+import HTML from './tabbly-reports-js-view.ts.html';
+import pubSub from '../../lib/core.pub-sub';
+
 
 export class TabblyReportsJsView {
 
@@ -25,10 +27,25 @@ export class TabblyReportsJsView {
   render(target: HTMLElement) {
     target.innerHTML = '';
     target.appendChild(this._content);
-    addEventListeners(target, {}, {});
+    addEventListeners(target, {
+      innerText: (e:HTMLElement, value:string) => {
+        e.innerText = value;
+        e.innerHTML = w3CodeColorize(e.innerHTML, 'js');
+      }
+    }, {});
     this.__loadReport(this._content.querySelector('[report-container]'));
+    include('./js/w3codecolor.js')
+      .then(() => this.__colorize());
   }
   
+  private __colorize() {
+    this._content
+        .querySelectorAll<Element>('.jsHigh,.htmlHigh')
+        .toArray()
+        .map( e => ({ e : e, mode : e.classList.contains('jsHigh') ? 'js' : 'html' }))
+        .forEach( e => e.e.innerHTML = w3CodeColorize(e.e.innerHTML, e.mode));   
+  }
+
   private __loadReport(target:HTMLElement){   
     // =========================================================================
     // Receptor de mensajes
@@ -46,7 +63,7 @@ export class TabblyReportsJsView {
     // Cargar el informe
     // =========================================================================
     include('./js/pro-0001.js').then((cancel:Function) => {
-      var __rd = (window as any).__reportDefinition(loader, core);
+      var __rd = __reportDefinition(loader, core);
       // =======================================================================
       // Cargar los datos
       // =======================================================================
@@ -56,9 +73,14 @@ export class TabblyReportsJsView {
             new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
             target.append(core.build('div', { innerHTML : __handler.buffer }));
             addEventListeners(target, {}, __rd.getContext());
-            cancel();      
+            cancel();
+            pubSub.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));
       });
     });
+     ajax.get('./js/pro-0001.js')
+         .then((res:string) => { 
+           pubSub.publish('msg/rpt/definition', res);
+         });
   }
 
 }

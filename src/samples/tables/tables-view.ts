@@ -4,6 +4,7 @@ import { core } from '../../lib/core';
 import { addEventListeners } from '../../lib/core.declarative';
 import { ProveedoresPageComponent } from './table-component';
 import HTML from './tables-view.ts.html';
+import include from '../../lib/core.include';
 
 export class TablesView {
 
@@ -24,13 +25,29 @@ export class TablesView {
     target.innerHTML = '';
     target.appendChild(this._content);
 
-    addEventListeners(target, {}, {});
+    addEventListeners(target, {
+      innerText: (e:HTMLElement, value:string, mode: string) => {
+        e.innerText = value;
+        include('./js/w3codecolor.js')
+          .then(() => e.innerHTML = w3CodeColorize(e.innerHTML, mode) );       
+      }
+    }, {});
 
     let __container = this._content
                           .querySelector<HTMLElement>('[table-container]');
     new ProveedoresPageComponent()
       .renderTo(__container)
       .loadData();
+
+    include('./js/w3codecolor.js')
+      .then(() => this.__colorize());
+  }
+
+  private __colorize() {
+    this._content
+        .querySelectorAll<Element>('.js')
+        .toArray()
+        .forEach( e => e.innerHTML = w3CodeColorize(e.innerHTML, 'js'));   
   }
  
 }
