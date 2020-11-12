@@ -7,7 +7,14 @@ const EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
 function addEventListeners(container:HTMLElement, handlers:any, context:any) {
 
   let fn = {
-    innerHTML : (e:HTMLElement, value:string) => e.innerHTML = value,
+    innerHTML : (e:HTMLElement, value:string, mode:string) => {
+      if (mode && mode == 'append') return e.innerHTML += value + '<br/>'; 
+      e.innerHTML = value;
+    },
+    innerText : (e:HTMLElement, value:string, mode:string) => {
+      if (mode && mode == 'append') return e.textContent += value + '\n'; 
+      e.innerHTML = value;
+    },
     className : (e:HTMLElement, value:string) => e.className = value } as any
   
   EVENTS.forEach((selector, index) => {
@@ -53,7 +60,7 @@ function addEventListeners(container:HTMLElement, handlers:any, context:any) {
                  if (f) f.apply(context, [e, data, ...tokens.slice(2)]);
                  return;
                }else{
-                 fn.innerHTML(e, data);
+                 fn.innerHTML(e, data, tokens[1]);
                }
              })
            }

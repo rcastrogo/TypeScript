@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addEventListeners = void 0;
+var tslib_1 = require("tslib");
 var core_1 = require("./core");
 var core_pub_sub_1 = require("./core.pub-sub");
 var EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
@@ -51,7 +52,7 @@ function addEventListeners(container, handlers, context) {
                             handlers[fnName] ||
                             core_1.core.getValue(fnName, context);
                         if (f)
-                            f.apply(context, [e, data]);
+                            f.apply(context, tslib_1.__spreadArrays([e, data], tokens.slice(2)));
                         return;
                     }
                     else {
@@ -94,6 +95,7 @@ function addEventListeners(container, handlers, context) {
                     e.onchange = function () { return fn_2.apply(context, [e]); };
                 else
                     e.oninput = function () { return fn_2.apply(context, [e]); };
+                e.onblur = function () { return fn_2.apply(context, [e]); };
             }
         });
     });

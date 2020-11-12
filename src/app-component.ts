@@ -8,6 +8,7 @@ import { TabblyReportsJsView } from './samples/tabbly-reports-js/tabbly-reports-
 import { TabblyReportsV2View } from './samples/tabbly-reports-v2/tabbly-reports-v2-view';
 import { TabblyReportsView } from './samples/tabbly-reports/tabbly-reports-view';
 import { TablesView } from './samples/tables/tables-view';
+import { ContentEditableView } from './samples/content-editable/content-editable-view';
 import { Constants } from './app.constants';
 
 
@@ -35,7 +36,7 @@ export function appComponent(container:HTMLElement){
       if(viewId == 'VIEW-REPORTS') new TabblyReportsView().render(__view_container);
       if(viewId == 'VIEW-REPORTS-V2') new TabblyReportsV2View().render(__view_container);
       if(viewId == 'VIEW-REPORTS-JS') new TabblyReportsJsView().render(__view_container);
-
+      if(viewId == 'VIEW-CONTENT-EDITABLE') new ContentEditableView().render(__view_container);
     }
   }, { });
 

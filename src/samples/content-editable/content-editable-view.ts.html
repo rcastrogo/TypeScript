@@ -1,0 +1,43 @@
+﻿<div>
+
+  <div class="w3-teal w3-center w3-padding">Content-editable</div>
+
+  <div class="w3-padding">
+
+    <p style="text-indent:1em;">
+      Ejemplo de edición de tabla.
+    </p>
+
+    <table class="w3-table-all"> 
+      <thead>
+        <tr>
+          <th style="width:1%;"></th>
+          <th class="">Id</th>
+          <th class="">Descripción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr xbind xfor="item in this.data" id="row-{item.id}">
+          <td xbind class="w3-border-right">
+            <input type="checkbox" disabled />
+          </td>
+          <td xbind="onblur:onblur;onfocus:onfocus;onkeypress:onkeypress"
+              data-index="{index}"
+              data-bak="{item.id}"
+              contenteditable="true">{item.id}</td>
+          <td xbind="onblur:onblur;onfocus:onfocus;onkeypress:onkeypress"
+              data-index="{index}"
+              data-bak="{item.descripcion}"
+              contenteditable="true">{item.descripcion}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="w3-padding">
+      <button on-click="doSave">Guardar</button>
+    </div>
+	  <div class="w3-code" style="overflow: auto;white-space: pre;" on-publish="msg/log:innerHTML:append"></div>
+
+  </div>
+
+</div>

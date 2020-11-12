@@ -1,10 +1,10 @@
 ﻿
 import HTML from './commands-view.ts.html';
-import { core} from '../../lib/core';
-import { addEventListeners } from '../../lib/core.declarative';
-import { Command, CommandManager } from '../../lib/core.commands';
-import { Constants } from '../../app.constants';
-import include from '../../lib/core.include';
+import { core} from '@src/core';
+import { addEventListeners } from '@src/core.declarative';
+import { Command, CommandManager } from '@src/core.commands';
+import { Constants } from '@src/../app.constants';
+import include from '@src/core.include'; 
 
 export class CommandsView {
 

@@ -4,9 +4,10 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack-dev-server --mode development --hot",
-    "build-api": "browserify ./dist-js/lib/api.js --standalone pol > ./dist-js/lib/pol.bundle.js",
-    "build-api-min": "browserify ./dist-js/lib/api.js --standalone pol | uglifyjs -c > ./dist-js/lib/pol.bundle.min.js",
-    "compile": "tsc -p ./tsconfig.json"
+    "build-api": "npm run compile && browserify ./dist-js/lib/api.js --standalone pol > ./dist-js/lib/pol.bundle.js",
+    "build-api-min": "npm run compile && browserify ./dist-js/lib/api.js --standalone pol | uglifyjs -c > ./dist-js/lib/pol.bundle.min.js",
+    "compile": "tsc -p ./tsconfig.api.json",
+    "build-lib": "webpack --optimize-minimize --mode production --config webpack.api.config.js"
   },
   "devDependencies": {
     "html-webpack-plugin": "^4.5.0",

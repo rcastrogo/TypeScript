@@ -52,7 +52,9 @@ module.exports = (env, options) => {
 				]
 		},
 		resolve: {
-			extensions: [ '.ts', '.tsx', '.js', 'html']
+			extensions: [ '.ts', '.tsx', '.js', 'html'],
+			alias: { '@src' : path.resolve(__dirname, './src/lib/')
+			}
 		},
 		resolveLoader: {
 		  modules: ['node_modules', path.resolve(__dirname, './loaders')]

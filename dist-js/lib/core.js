@@ -119,7 +119,7 @@ var Core = /** @class */ (function () {
             // Buscar la propiedad en un ambito superior si existe
             // =====================================================
             if (value === undefined && a.outerScope) {
-                value = this.getValue(name, a.outerScope);
+                value = exports.core.getValue(name, a.outerScope);
             }
             // =====================================================
             // Existe el valor. Se le aplica el prototipo si procede
