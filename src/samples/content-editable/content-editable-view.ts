@@ -7,11 +7,17 @@ import { Constants } from '@src/../app.constants';
 import { fillTemplate } from '@src/core.templates';
 import include from '@src/core.include'; 
 import pubSub from '@src/core.pub-sub';
+import * as grid from '@src/controls.editable-grid';
+import { TextViewer } from '@src/controls.text-viewer';
+import { ajax } from '@src/core.ajax';
+
 
 export class ContentEditableView {
 
   private _config = core.config(Constants.APP_CONFIG_NAME);
   private _content:HTMLElement; 
+  private _editableGrid:grid.EditableGrid;
+  private _textViewer:TextViewer;
   private _data = [ 
     { id: 1, descripcion: 'Descripción 1'},
     { id: 2, descripcion: 'Descripción 2'},
@@ -21,62 +27,34 @@ export class ContentEditableView {
   // Constructor
   // ============================================================
   constructor() {
-     this._config.write('ContentEditableView', Date.now.toString());
+    this._config.write('ContentEditableView', Date.now.toString());
+    this._textViewer = new TextViewer();
   }
   // ============================================================
   // Render
   // ============================================================
   render(target: HTMLElement) {
+    // ====================================================================
+    // Crear UI
+    // ====================================================================
     this._content = core.build('div', { innerHTML : HTML}, true); 
     target.innerHTML = '';
     target.appendChild(this._content);
-
-    let __context = {
-      data : this._data,
-      onblur: () => {
-        return (e:FocusEvent) => {
-          let td = e.currentTarget as HTMLElement;
-          td.style.fontStyle = '';
-          pubSub.publish(
-            'msg/log', 
-            'onblur: {index}, {bak}'.format(td.dataset)
-          );
-        }  
-      },
-      onfocus: () => {
-        return (e:FocusEvent) => {
-          let td = e.currentTarget as HTMLElement;
-          td.style.fontStyle = 'italic';
-          td.style.outline   = '0px solid transparent';
-          pubSub.publish(
-            'msg/log', 
-            'onfocus: {index}, {bak}'.format(td.dataset)
-          );
-        }  
-      },
-      onkeypress: () => {
-        return (e:KeyboardEvent) => {
-          if(e.keyCode==13){                   
-            e.preventDefault();
-            return false;      
-          } 
-        }
-      }
-    }
-
-    fillTemplate(target, __context);
-
+    fillTemplate(target, { data : this._data });
+    // ====================================================================
+    // Enlazar eventos declarados en el html
+    // ====================================================================
     addEventListeners(target, {
+      writeLog : (e:HTMLElement, value:string, mode:string) => {
+        if (mode && mode == 'append') return e.innerHTML += value + '<br/>'; 
+        e.innerHTML = value;
+      },
       doSave: () => {
-        let size = 2;
         let data = target.querySelectorAll<HTMLTableCellElement>('td[data-index]')
                          .toArray()
-                         .map( c => c.textContent)
-                         .reduce((acc, curr, i, self) => {
-                            if(!(i % size)) return [...acc, self.slice(i, i + size)];
-                            return acc;
-                         }, [])
-                         .map( (cells, i) => {
+                         .map(c => c.textContent)
+                         .split(2)
+                         .map((cells, i) => {
                            return { source : this._data[i],
                                     edit   : { id          : cells[0],
                                                descripcion : cells[1]}}});
@@ -84,7 +62,37 @@ export class ContentEditableView {
 
       }
     },{});
-
+    // ====================================================================
+    // Inicializar la edición de la tabla
+    // ====================================================================
+    let __table = target.querySelector<HTMLTableElement>('table');
+    this._editableGrid = new grid.EditableGrid(
+      __table,
+      // ===========================================================================
+      // onFocus
+      // ===========================================================================
+      (sender, event) => {
+        event.td.style.outline   = '0px solid transparent';
+        let message = 'onfocus -> [{td.dataset.index}, {td.cellIndex}] id: {tr.id}';
+        pubSub.publish('msg/log', message.format(event));
+      },
+      // ===========================================================================
+      // onChange
+      // ===========================================================================
+      (sender, event) => {
+        let message = 'onChange -> [{td.dataset.index}, {td.cellIndex}] ' +
+                      'id: {tr.id} [ {previous} -> {current}]';
+        pubSub.publish('msg/log', message.format(event));  
+      });
+    // ====================================================================
+    // Inicializar el visor de texto
+    // ====================================================================
+    target.querySelector('[text-viewer]')
+          .appendChild(this._textViewer.getControl());
+    ajax.get('./js/pro-0001.txt')
+        .then((res:string) => {
+          this._textViewer.setContent(res);
+        });
   }
 
 }

@@ -7,7 +7,8 @@ var core_pub_sub_1 = require("./core.pub-sub");
 var EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
 function addEventListeners(container, handlers, context) {
     var fn = {
-        innerHTML: function (e, value) { return e.innerHTML = value; },
+        innerHTML: function (e, value, mode) { return e.innerHTML = value; },
+        innerText: function (e, value, mode) { return e.innerText = value; },
         className: function (e, value) { return e.className = value; }
     };
     EVENTS.forEach(function (selector, index) {
@@ -56,7 +57,7 @@ function addEventListeners(container, handlers, context) {
                         return;
                     }
                     else {
-                        fn.innerHTML(e, data);
+                        fn.innerHTML(e, data, tokens[1]);
                     }
                 });
             }

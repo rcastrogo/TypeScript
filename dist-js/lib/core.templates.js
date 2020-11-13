@@ -99,7 +99,7 @@ function fillTemplate(e, scope) {
             // Que recibir�: Data.toUpper(scope.Other, 'A', '5', child)
             // ==========================================================================
             if (core_1.core.isFunction(_value)) {
-                var _args = String.trimValues(_params.split(/\s|#/))
+                var _args = String.trimValues((_params || '').split(/\s|#/))
                     .reduce(function (a, p) {
                     a.push(p.charAt(0) == '@' ? core_1.core.getValue(p.slice(1), scope)
                         : p);

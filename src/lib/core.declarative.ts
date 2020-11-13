@@ -7,14 +7,8 @@ const EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
 function addEventListeners(container:HTMLElement, handlers:any, context:any) {
 
   let fn = {
-    innerHTML : (e:HTMLElement, value:string, mode:string) => {
-      if (mode && mode == 'append') return e.innerHTML += value + '<br/>'; 
-      e.innerHTML = value;
-    },
-    innerText : (e:HTMLElement, value:string, mode:string) => {
-      if (mode && mode == 'append') return e.textContent += value + '\n'; 
-      e.innerHTML = value;
-    },
+    innerHTML : (e:HTMLElement, value:string, mode:string) => e.innerHTML = value,
+    innerText : (e:HTMLElement, value:string, mode:string) => e.innerText = value,
     className : (e:HTMLElement, value:string) => e.className = value } as any
   
   EVENTS.forEach((selector, index) => {

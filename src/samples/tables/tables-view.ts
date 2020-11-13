@@ -26,7 +26,7 @@ export class TablesView {
     target.appendChild(this._content);
 
     addEventListeners(target, {
-      innerText: (e:HTMLElement, value:string, mode: string) => {
+      localInnerText: (e:HTMLElement, value:string, mode: string) => {
         e.innerText = value;
         include('./js/w3codecolor.js')
           .then(() => e.innerHTML = w3CodeColorize(e.innerHTML, mode) );       

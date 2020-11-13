@@ -340,6 +340,12 @@ Array.prototype.toDictionary = function(prop : string, value? : string) : object
                       return a;
                     }, {});  
 }
+Array.prototype.split = function (size: number) {
+  return this.reduce((acc:any[], current:any, i:number, self:any[]) => {
+                      if(!(i % size)) return [...acc, self.slice(i, i + size)];
+                      return acc;
+                    }, []);
+}
 
 NodeList.prototype.toArray = function (){
   return Array.from(this);

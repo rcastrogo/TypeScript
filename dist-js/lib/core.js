@@ -2,6 +2,7 @@
 // ts-nocheck
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.core = void 0;
+var tslib_1 = require("tslib");
 var Core = /** @class */ (function () {
     function Core() {
     }
@@ -347,6 +348,13 @@ Array.prototype.toDictionary = function (prop, value) {
         a[d[prop]] = value ? d[value] : d;
         return a;
     }, {});
+};
+Array.prototype.split = function (size) {
+    return this.reduce(function (acc, current, i, self) {
+        if (!(i % size))
+            return tslib_1.__spreadArrays(acc, [self.slice(i, i + size)]);
+        return acc;
+    }, []);
 };
 NodeList.prototype.toArray = function () {
     return Array.from(this);

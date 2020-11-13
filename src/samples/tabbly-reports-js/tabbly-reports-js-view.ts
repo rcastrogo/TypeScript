@@ -28,7 +28,7 @@ export class TabblyReportsJsView {
     target.innerHTML = '';
     target.appendChild(this._content);
     addEventListeners(target, {
-      innerText: (e:HTMLElement, value:string) => {
+      localInnerText: (e:HTMLElement, value:string) => {
         e.innerText = value;
         e.innerHTML = w3CodeColorize(e.innerHTML, 'js');
       }

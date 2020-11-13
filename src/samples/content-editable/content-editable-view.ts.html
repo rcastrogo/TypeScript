@@ -2,11 +2,11 @@
 
   <div class="w3-teal w3-center w3-padding">Content-editable</div>
 
-  <div class="w3-padding">
+  <h2 class="w3-margin">
+    Edición de tablas.
+  </h2>
 
-    <p style="text-indent:1em;">
-      Ejemplo de edición de tabla.
-    </p>
+  <div class="w3-padding">
 
     <table class="w3-table-all"> 
       <thead>
@@ -21,14 +21,8 @@
           <td xbind class="w3-border-right">
             <input type="checkbox" disabled />
           </td>
-          <td xbind="onblur:onblur;onfocus:onfocus;onkeypress:onkeypress"
-              data-index="{index}"
-              data-bak="{item.id}"
-              contenteditable="true">{item.id}</td>
-          <td xbind="onblur:onblur;onfocus:onfocus;onkeypress:onkeypress"
-              data-index="{index}"
-              data-bak="{item.descripcion}"
-              contenteditable="true">{item.descripcion}</td>
+          <td xbind data-index="{index}" contenteditable="true">{item.id}</td>
+          <td xbind data-index="{index}" contenteditable="true">{item.descripcion}</td>
         </tr>
       </tbody>
     </table>
@@ -36,7 +30,14 @@
     <div class="w3-padding">
       <button on-click="doSave">Guardar</button>
     </div>
-	  <div class="w3-code" style="overflow: auto;white-space: pre;" on-publish="msg/log:innerHTML:append"></div>
+	  <div class="w3-code" style="overflow: auto;white-space: pre;" on-publish="msg/log:writeLog:append"></div>
+
+  </div>
+
+  <h2 class="w3-margin">
+    Visor de texto
+  </h2>
+  <div class="w3-container w3-margin w3-round w3-border" style="height:250px;position:relative" text-viewer>
 
   </div>
 

@@ -80,6 +80,7 @@ declare interface Array<T> {
   toGroupWrapper(context : string) : (g: string, prop: string, name: string) => any;
   sum(prop : string) : number;
   toDictionary(propName: string, value?: string): object;
+  split(size:number): T[];
 }
 
 interface NodeListOf<TNode extends Node> extends NodeList {

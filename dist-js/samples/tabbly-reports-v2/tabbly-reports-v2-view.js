@@ -27,7 +27,7 @@ var TabblyReportsV2View = /** @class */ (function () {
         target.innerHTML = '';
         target.appendChild(this._content);
         core_declarative_1.addEventListeners(target, {
-            innerText: function (e, value) {
+            localInnerText: function (e, value) {
                 e.innerText = value;
                 e.innerHTML = w3CodeColorize(e.innerHTML, 'js');
             }

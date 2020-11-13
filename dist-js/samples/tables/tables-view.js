@@ -24,7 +24,7 @@ var TablesView = /** @class */ (function () {
         target.innerHTML = '';
         target.appendChild(this._content);
         core_declarative_1.addEventListeners(target, {
-            innerText: function (e, value, mode) {
+            localInnerText: function (e, value, mode) {
                 e.innerText = value;
                 core_include_1.default('./js/w3codecolor.js')
                     .then(function () { return e.innerHTML = w3CodeColorize(e.innerHTML, mode); });

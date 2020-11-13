@@ -128,7 +128,8 @@ var core_pub_sub_1 = require("./core.pub-sub");
 var EVENTS = ['[on-click]', '[on-publish]', '[route-link]', '[on-change]'];
 function addEventListeners(container, handlers, context) {
     var fn = {
-        innerHTML: function (e, value) { return e.innerHTML = value; },
+        innerHTML: function (e, value, mode) { return e.innerHTML = value; },
+        innerText: function (e, value, mode) { return e.innerText = value; },
         className: function (e, value) { return e.className = value; }
     };
     EVENTS.forEach(function (selector, index) {
@@ -177,7 +178,7 @@ function addEventListeners(container, handlers, context) {
                         return;
                     }
                     else {
-                        fn.innerHTML(e, data);
+                        fn.innerHTML(e, data, tokens[1]);
                     }
                 });
             }
@@ -317,6 +318,7 @@ exports.default = include;
 // ts-nocheck
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.core = void 0;
+var tslib_1 = require("tslib");
 var Core = /** @class */ (function () {
     function Core() {
     }
@@ -663,11 +665,18 @@ Array.prototype.toDictionary = function (prop, value) {
         return a;
     }, {});
 };
+Array.prototype.split = function (size) {
+    return this.reduce(function (acc, current, i, self) {
+        if (!(i % size))
+            return tslib_1.__spreadArrays(acc, [self.slice(i, i + size)]);
+        return acc;
+    }, []);
+};
 NodeList.prototype.toArray = function () {
     return Array.from(this);
 };
 
-},{}],8:[function(require,module,exports){
+},{"tslib":15}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Paginator = void 0;
@@ -1931,7 +1940,7 @@ function fillTemplate(e, scope) {
             // Que recibir�: Data.toUpper(scope.Other, 'A', '5', child)
             // ==========================================================================
             if (core_1.core.isFunction(_value)) {
-                var _args = String.trimValues(_params.split(/\s|#/))
+                var _args = String.trimValues((_params || '').split(/\s|#/))
                     .reduce(function (a, p) {
                     a.push(p.charAt(0) == '@' ? core_1.core.getValue(p.slice(1), scope)
                         : p);
