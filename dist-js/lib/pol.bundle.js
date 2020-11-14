@@ -14,10 +14,182 @@ __core.reportLoader = require('./core.tabbly.engine');
 __core.reportEngine = require('./core.tabbly.loader');
 __core.jsReportLoader = require('./core.tabbly.v2.engine');
 __core.jsReportEngine = require('./core.tabbly.v2.loader');
+__core.controls       = { grid       : require('./controls.editable-grid'),
+                          textViewer : require('./controls.text-viewer')}
 
 module.exports = __core;
 
-},{"./core":7,"./core.ajax":2,"./core.commands":3,"./core.declarative":4,"./core.dialogs":5,"./core.include":6,"./core.paginator":8,"./core.pub-sub":9,"./core.tabbly.engine":10,"./core.tabbly.loader":11,"./core.tabbly.v2.engine":12,"./core.tabbly.v2.loader":13,"./core.templates":14}],2:[function(require,module,exports){
+},{"./controls.editable-grid":2,"./controls.text-viewer":3,"./core":9,"./core.ajax":4,"./core.commands":5,"./core.declarative":6,"./core.dialogs":7,"./core.include":8,"./core.paginator":10,"./core.pub-sub":11,"./core.tabbly.engine":12,"./core.tabbly.loader":13,"./core.tabbly.v2.engine":14,"./core.tabbly.v2.loader":15,"./core.templates":16}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EditableGrid = void 0;
+var core_pub_sub_1 = require("./core.pub-sub");
+var EditableGrid = /** @class */ (function () {
+    function EditableGrid(table, onFocus, onChange) {
+        var _this = this;
+        this.currentIndex = -1;
+        this.previous = undefined;
+        this.table = table;
+        // =======================================================
+        // Onfocus
+        // =======================================================
+        var __onfocus = function (e) {
+            var __td = e.target;
+            var __tr = __td.parentNode;
+            _this.previous = __td.textContent.trim();
+            _this.currentIndex = __tr.rowIndex;
+            var __eventArg = {
+                tr: __tr,
+                td: __td,
+                target: __td,
+                current: _this.previous
+            };
+            core_pub_sub_1.default.publish(EditableGrid.OnfocusMessage, __eventArg);
+            if (onFocus)
+                onFocus(_this, __eventArg);
+        };
+        // =======================================================
+        // Onblur
+        // =======================================================
+        var __onblur = function (e) {
+            var __td = e.target;
+            var __tr = __td.parentNode;
+            if (_this.previous != undefined &&
+                _this.previous != __td.textContent.trim()) {
+                var __eventArg = {
+                    tr: __tr,
+                    td: __td,
+                    target: __td,
+                    previous: _this.previous,
+                    current: __td.textContent.trim()
+                };
+                core_pub_sub_1.default.publish(EditableGrid.OnChangeMessage, __eventArg);
+                if (onChange)
+                    onChange(_this, __eventArg);
+                _this.previous = undefined;
+            }
+            ;
+        };
+        // =======================================================
+        // Celdas editables
+        // =======================================================
+        table.querySelectorAll('td[contenteditable]')
+            .toArray()
+            .forEach(function (e) {
+            e.onblur = __onblur;
+            e.onfocus = __onfocus;
+        });
+        // =======================================================
+        // onkeypress : Evitar multiples l�neas
+        // =======================================================
+        table.onkeypress = function (e) {
+            if (e.keyCode == 13) {
+                if (e.preventDefault)
+                    e.preventDefault();
+                return false;
+            }
+        };
+        // =======================================================================================================================
+        // onkeydown : Cambio de celda activa
+        // =======================================================================================================================
+        table.onkeydown = function (e) {
+            var __res = true;
+            var __sender = e.target;
+            if (__sender.tagName == 'TD' && [13, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+                var __td = __sender;
+                var __row = __sender.parentNode;
+                var __pos = window.getSelection().getRangeAt(0).startOffset;
+                var __focus = function (t, r, c) {
+                    e.preventDefault();
+                    try {
+                        t.rows[r].cells[c].focus();
+                    }
+                    catch (e) { }
+                    __res = false;
+                };
+                if (e.keyCode == 13)
+                    __focus(table, __row.rowIndex, __td.cellIndex + 1); // Next
+                if (e.keyCode == 38 && __row.rowIndex > 1)
+                    __focus(table, __row.rowIndex - 1, __td.cellIndex); // Up
+                if (e.keyCode == 40 && __row.rowIndex < table.rows.length - 1)
+                    __focus(table, __row.rowIndex + 1, __td.cellIndex); // Down                         
+                if (e.keyCode == 39 && __pos == __sender.textContent.length)
+                    __focus(table, __row.rowIndex, __td.cellIndex + 1); // Right
+                if (e.keyCode == 37 && __pos == 0)
+                    __focus(table, __row.rowIndex, __td.cellIndex - 1); // Left
+            }
+            return __res;
+        };
+    }
+    EditableGrid.OnfocusMessage = 'editable-grid/focus';
+    EditableGrid.OnChangeMessage = 'editable-grid/change';
+    return EditableGrid;
+}());
+exports.EditableGrid = EditableGrid;
+
+},{"./core.pub-sub":11}],3:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TextViewer = void 0;
+var core_1 = require("./core");
+//.svc_viewer{overflow:hidden;}
+//.scv_Main  {position:absolute;top:0;left:0;right:0;bottom:0;overflow:auto;padding:0;}        
+//.scv_TextContainer{ position:absolute;top:0;left:4.4em;right:0;height:auto;z-index:4;margin:0;user-select: text; }
+//.scv_TextContainer{ padding:.4em;white-space:pre;overflow:initial;font-family:Monospace;tab-size:4;} 
+//.scv_LineContainer{ padding:.4em;position:absolute;top:0;left:0;height:auto;margin:0;z-index:5;overflow:hidden;background-color:lightyellow;border-right:solid 1px silver;}
+//.scv_LineContainer{ font-weight:bold;font-family:Monospace;color:Gray;text-align:right;width:3.5em;box-sizing:border-box;user-select:none }            
+var __data_Uri = 'data:text/css;base64,LnN2Y192aWV3ZXJ7b3ZlcmZsb3c6aGlkZGVuO30NCi5zY3ZfTWFpbiAge3Bvc2l0aW9uOmFic29sdXRlO3RvcDowO2xlZnQ6MDtyaWdodDowO2JvdHRvbTowO292ZXJmbG93OmF1dG87cGFkZGluZzowO30gICAgICAgIA0KLnNjdl9UZXh0Q29udGFpbmVyeyBwb3NpdGlvbjphYnNvbHV0ZTt0b3A6MDtsZWZ0OjQuNGVtO3JpZ2h0OjA7aGVpZ2h0OmF1dG87ei1pbmRleDo0O21hcmdpbjowO3VzZXItc2VsZWN0OiB0ZXh0OyB9DQouc2N2X1RleHRDb250YWluZXJ7IHBhZGRpbmc6LjRlbTt3aGl0ZS1zcGFjZTpwcmU7b3ZlcmZsb3c6aW5pdGlhbDtmb250LWZhbWlseTpNb25vc3BhY2U7dGFiLXNpemU6NDt9IA0KLnNjdl9MaW5lQ29udGFpbmVyeyBwYWRkaW5nOi40ZW07cG9zaXRpb246YWJzb2x1dGU7dG9wOjA7bGVmdDowO2hlaWdodDphdXRvO21hcmdpbjowO3otaW5kZXg6NTtvdmVyZmxvdzpoaWRkZW47YmFja2dyb3VuZC1jb2xvcjpsaWdodHllbGxvdztib3JkZXItcmlnaHQ6c29saWQgMXB4IHNpbHZlcjt9DQouc2N2X0xpbmVDb250YWluZXJ7IGZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6TW9ub3NwYWNlO2NvbG9yOkdyYXk7dGV4dC1hbGlnbjpyaWdodDt3aWR0aDozLjVlbTtib3gtc2l6aW5nOmJvcmRlci1ib3g7dXNlci1zZWxlY3Q6bm9uZSB9';
+var __template = '<div class="scv_Main">' +
+    '  <pre class="scv_LineContainer" id="svc_{0}_line"></pre>' +
+    '  <pre class="scv_TextContainer" id="svc_{0}_code"></pre>' +
+    '</div>';
+var __counter = 0;
+var __css = false;
+function __initCss() {
+    if (__css)
+        return;
+    document.querySelector('head')
+        .appendChild(core_1.core.build('link', { rel: 'stylesheet',
+        type: 'text/css',
+        href: __data_Uri }));
+    __css = true;
+}
+var TextViewer = /** @class */ (function () {
+    function TextViewer() {
+        var _this = this;
+        this.id = 'svc_{0}'.format(++__counter);
+        __initCss();
+        this._control = core_1.core.build('div', { className: 'svc_viewer',
+            id: this.id,
+            innerHTML: __template.format(__counter) });
+        this._control
+            .querySelector('.scv_Main')
+            .onscroll = function (event) {
+            var __target = event.target;
+            _this._control
+                .querySelector('.scv_LineContainer')
+                .style.left = '{0}px'.format(__target.scrollLeft);
+        };
+    }
+    TextViewer.prototype.setContent = function (value) {
+        var __i = 0;
+        this._control
+            .querySelector('.scv_LineContainer')
+            .innerHTML = (value + '\r\n').replace(/.*\r\n|\r|\n/mg, function () { return ++__i + '<br/>'; });
+        var __div = this._control.querySelector('.scv_TextContainer');
+        __div.textContent = value;
+        // onLineClick
+        // __div.innerHTML = (__div.innerHTML + '\n').replace(/^(.*)\r\n|\r|\n/gim, '<span>$1</span><br/>')
+        return this;
+    };
+    TextViewer.prototype.getControl = function () {
+        return this._control;
+    };
+    return TextViewer;
+}());
+exports.TextViewer = TextViewer;
+
+},{"./core":9}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ajax = void 0;
@@ -66,7 +238,7 @@ var ajax = {
 };
 exports.ajax = ajax;
 
-},{}],3:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManager = void 0;
@@ -118,7 +290,7 @@ function CommandManager(doc) {
 exports.CommandManager = CommandManager;
 ;
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addEventListeners = void 0;
@@ -224,7 +396,7 @@ function addEventListeners(container, handlers, context) {
 }
 exports.addEventListeners = addEventListeners;
 
-},{"./core":7,"./core.pub-sub":9,"tslib":15}],5:[function(require,module,exports){
+},{"./core":9,"./core.pub-sub":11,"tslib":17}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DialogHelper = void 0;
@@ -282,7 +454,7 @@ var DialogHelper = /** @class */ (function () {
 }());
 exports.DialogHelper = DialogHelper;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var includes = [];
@@ -313,7 +485,7 @@ function include(url) {
 }
 exports.default = include;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 // ts-nocheck
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -676,7 +848,7 @@ NodeList.prototype.toArray = function () {
     return Array.from(this);
 };
 
-},{"tslib":15}],8:[function(require,module,exports){
+},{"tslib":17}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Paginator = void 0;
@@ -715,7 +887,7 @@ var Paginator = /** @class */ (function () {
 }());
 exports.Paginator = Paginator;
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -778,7 +950,7 @@ exports.default = {
     }
 };
 
-},{"tslib":15}],10:[function(require,module,exports){
+},{"tslib":17}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
@@ -1115,7 +1287,7 @@ var ReportEngine = /** @class */ (function () {
 }());
 exports.ReportEngine = ReportEngine;
 
-},{"./core":7,"./core.templates":14}],11:[function(require,module,exports){
+},{"./core":9,"./core.templates":16}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loader = void 0;
@@ -1278,7 +1450,7 @@ function loadReport(code) {
 var loader = { load: loadReport };
 exports.loader = loader;
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
@@ -1709,7 +1881,7 @@ function onMessage(message) {
 //}
 //}
 
-},{"./core":7}],13:[function(require,module,exports){
+},{"./core":9}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loader = void 0;
@@ -1838,7 +2010,7 @@ function loadReport(code) {
 var loader = { load: loadReport };
 exports.loader = loader;
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fillTemplate = exports.executeTemplate = exports.merge = void 0;
@@ -1990,7 +2162,7 @@ function executeTemplate(e, values, dom) {
 }
 exports.executeTemplate = executeTemplate;
 
-},{"./core":7,"tslib":15}],15:[function(require,module,exports){
+},{"./core":9,"tslib":17}],17:[function(require,module,exports){
 (function (global){(function (){
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.

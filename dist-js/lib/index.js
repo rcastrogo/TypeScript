@@ -12,4 +12,6 @@ __core.reportEngine = require('./core.tabbly.loader');
 __core.jsReportLoader = require('./core.tabbly.v2.engine');
 __core.jsReportEngine = require('./core.tabbly.v2.loader');
 __core.version = require('./version.ts.html');
+__core.controls = { grid: require('./controls.editable-grid'),
+    textViewer: require('./controls.text-viewer') };
 module.exports = __core;
