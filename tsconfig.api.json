@@ -6,7 +6,7 @@
     "importHelpers": true,
     "moduleResolution": "node",
     "sourceMap": false,
-    "removeComments": false,
+    "removeComments": true,
     "noUnusedLocals": false,
     "target": "ES5",
     "typeRoots": [
