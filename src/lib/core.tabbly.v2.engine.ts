@@ -4,8 +4,8 @@ import {core} from './core';
 declare interface Mediator {
   message:({}) => void;
   send:({}) => void;
-  flush:() => void;
-  clear:() => void;
+  flush?:() => void;
+  clear?:() => void;
 }
 
 declare interface ReportSection {
@@ -27,7 +27,7 @@ export class ReportEngine {
 
   generateReport(rd:any, data:Array<any>, mediator:Mediator){
     var __that = this;
-    mediator.clear();
+    if(mediator.clear) mediator.clear();
     mediator.message({ type : 'report.begin' });
     var __rd      = rd; // || module.ReportEngine.rd;
     // ===========================================================================================
@@ -300,10 +300,10 @@ export class ReportEngine {
     __grandTotalSections();
     mediator.message({ type : 'report.render.end' });
     mediator.message({ type : 'report.end' });
-    mediator.flush();
+    if(mediator.flush) mediator.flush();
     //console.timeEnd('Render');
+    //console.log(this.BS);
   } 
-
 
   merge(template:string, o:any) {
     return template.replace(/{([^{]+)?}/g, function (m, key) {

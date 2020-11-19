@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Paginator = void 0;
-var Paginator = /** @class */ (function () {
+var Paginator = (function () {
     function Paginator() {
     }
     Paginator.paginate = function (data, currentPage, pageSize, title) {

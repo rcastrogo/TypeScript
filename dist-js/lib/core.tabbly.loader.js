@@ -20,7 +20,6 @@ function loadReport(code) {
         return '';
     }
     function __parse_properties(value) {
-        // var __reg = /(id|colspan|rowspan|className|html|xbind|style|key|header|tag):('[^']*'|[^\s]*)/g;
         var __reg = /([a-zA-Z0-9_\-]*)\s*:\s*('[^']*'|[^\s]*)/g;
         var __o = {};
         var __match = __reg.exec(value);

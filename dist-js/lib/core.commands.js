@@ -10,10 +10,6 @@ function CommandManager(doc) {
             _this.undos.length = 0;
             _this.redos.length = 0;
         },
-        /**
-         * Ejecuta un comando sobre el documento
-         * @param command Comando a ejecutar
-         */
         executeCommad: function (command) {
             try {
                 _this.undos.push(command.execute(doc));
@@ -23,9 +19,6 @@ function CommandManager(doc) {
                 console.error(e);
             }
         },
-        /**
-         * Deshace los cambios realizados en el documento por el �ltimo comamdo
-         * */
         undo: function () {
             if (_this.undos.length > 0) {
                 _this.redos.push(_this.undos
@@ -33,9 +26,6 @@ function CommandManager(doc) {
                     .undo(doc));
             }
         },
-        /**
-         * Vuelve a ejecutar el �ltimo comando sobre el documento
-         * */
         redo: function () {
             if (_this.redos.length > 0) {
                 _this.undos.push(_this.redos

@@ -5,6 +5,8 @@ import { addEventListeners } from '../../lib/core.declarative';
 import { ProveedoresPageComponent } from './table-component';
 import HTML from './tables-view.ts.html';
 import include from '../../lib/core.include';
+import { CollapsibleBox } from '../../lib/controls.collapsible-box';
+import { ListViewComponent } from './list-view-component';
 
 export class TablesView {
 
@@ -33,14 +35,30 @@ export class TablesView {
       }
     }, {});
 
-    let __container = this._content
-                          .querySelector<HTMLElement>('[table-container]');
+    // ==========================================================================
+    // Edición de tablas
+    // ==========================================================================
     new ProveedoresPageComponent()
-      .renderTo(__container)
+      .renderTo(core.element('[table-container]', this._content))
       .loadData();
+
+    // ==========================================================================
+    // ListView
+    // ==========================================================================
+    CollapsibleBox.create('Listview', '-')
+                  .appendTo(core.element('[list-view-container]', this._content))
+                  .onexpand.add(this.__loadListview);
 
     include('./js/w3codecolor.js')
       .then(() => this.__colorize());
+  }
+
+  __loadListview(event:string, sender:CollapsibleBox){
+    if(sender.loaded) return;
+    sender.loaded = true;
+    new ListViewComponent()
+          .renderTo(sender.getBody())
+          .loadData();
   }
 
   private __colorize() {

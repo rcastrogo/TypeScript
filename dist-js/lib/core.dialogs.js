@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DialogHelper = void 0;
-var DialogHelper = /** @class */ (function () {
+var DialogHelper = (function () {
     function DialogHelper() {
     }
     DialogHelper.getWrapper = function (id) {

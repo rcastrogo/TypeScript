@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
 var core_1 = require("./core");
 var core_templates_1 = require("./core.templates");
-var ReportEngine = /** @class */ (function () {
+var ReportEngine = (function () {
     function ReportEngine() {
         this.BS = {};
         this.module_ReportEngine_Copy = function (source, dest) {
@@ -72,22 +72,13 @@ var ReportEngine = /** @class */ (function () {
         if (e.attributes.getNamedItem('xbind'))
             _elements.push(e);
         _elements.forEach(function (child) {
-            // ============================================================================
-            // Atributos que es necesario procesar. Ej: id="txt-{index}"
-            // ============================================================================
             core_1.core.toArray(child.attributes)
                 .where({ value: /{[^{]+?}/g })
                 .map(function (a) { return a.value = core_templates_1.merge(a.value, scope); });
-            // ============================================================================
-            // Nodos texto de este elemento
-            // ============================================================================
             core_1.core.toArray(child.childNodes)
                 .where({ nodeType: 3 })
                 .where({ textContent: /{[^{]+?}/g })
                 .forEach(function (text) { return text.textContent = core_templates_1.merge(text.textContent, scope, text); });
-            // ============================================================================
-            // Propiedades que establecer
-            // ============================================================================
             String.trimValues(child.attributes
                 .getNamedItem('xbind')
                 .value
@@ -101,7 +92,6 @@ var ReportEngine = /** @class */ (function () {
                 if (core_1.core.isFunction(_value)) {
                     var _args = _params.slice(1)
                         .reduce(function (a, p) {
-                        // xbind="textContent:Data.fnTest @PlainObject,A,5"
                         a.push(p.charAt(0) == '@' ? core_1.core.getValue(p.slice(1), scope) : p);
                         return a;
                     }, [scope, child]);
@@ -232,16 +222,10 @@ var ReportEngine = /** @class */ (function () {
         var _this = this;
         var __that = this;
         this.BS = { reportDefinition: rd };
-        // ================================================================================================
-        // Ordenar los datos
-        // ================================================================================================
         if (rd.Iteratefn)
             data.forEach(rd.Iteratefn);
         if (rd.orderBy)
             data.sortBy(rd.orderBy, false);
-        // ================================================================================================
-        // Inicializar los grupos
-        // ================================================================================================
         var __summary = JSON.parse(rd.summary || '{}');
         function __createGroups() {
             return rd.groups
@@ -277,9 +261,6 @@ var ReportEngine = /** @class */ (function () {
                 };
             }) || [];
         }
-        // ================================================================================================
-        // Inicializar el informe e imprimirlo
-        // ================================================================================================
         var __wrapper = {
             DataSet: data,
             HideDetail: rd.hideDetail == 'true' || false,

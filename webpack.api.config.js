@@ -21,6 +21,10 @@ module.exports = (env, options) => {
 						test: /\.ts\.html$/i,
 						use: ['html-loader']
 					},
+				  {
+						test: /\.ts\.css$/i,
+						use: ['html-loader']
+					},
 					{
 						test: /\.tsx?$/,
 						loader: 'ts-loader'
@@ -28,7 +32,7 @@ module.exports = (env, options) => {
 				]
 		},
 		resolve: {
-			extensions: [ '.ts', '.tsx', '.js', 'html'],
+			extensions: ['.ts', '.tsx', '.js', 'html', 'css'],
 			alias: { '@src' : path.resolve(__dirname, './src/lib/')
 			}
 		},

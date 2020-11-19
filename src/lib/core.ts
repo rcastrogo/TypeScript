@@ -3,7 +3,7 @@
 class Core implements CoreConstructor{
 
   isNull    (v : any) : boolean { return v === null;}
-  toArray   (v : any) : any[] { return Array.from(v); }
+  toArray   (v : any) : any[] { return Array.from ? Array.from(v) : Array.prototype.slice.call(v); }
   isArray   (v : any) : boolean {return Array.isArray(v); }
   isString  (v : any) : boolean { return typeof v == 'string'; }
   isBoolean (v : any) : boolean { return typeof v == 'boolean'; }
@@ -62,6 +62,16 @@ class Core implements CoreConstructor{
     if(__targets.length) return __targets.toArray();
     return null
   }; 
+
+  element<T extends Element = HTMLElement>(idOrSelector:string, targets? : HTMLElement): T{
+    return (document.getElementById(idOrSelector) || 
+            this.elements(idOrSelector, targets)[0] as unknown) as T;
+  };
+
+  elements<T extends Element = HTMLElement>(selector:string, targets? : HTMLElement): T[]{
+    return (targets || document).querySelectorAll<T>(selector)
+                                .toArray();
+  };
 
   build(tagName : string, options : object, firstElementChild?: boolean): HTMLElement {
     let o = this.isString(options) ? { innerHTML : options } : options;
@@ -223,6 +233,7 @@ String.prototype.htmlDecode = function (){
                           .documentElement
                           .textContent;
   }
+String.prototype.startsWith = String.prototype.startsWith || function(t){ return this.indexOf(t) == 0; } 
 // =================================================================================================
 // Array.prototype
 // =================================================================================================
@@ -311,9 +322,12 @@ Array.prototype.distinct = function(sentence = '') {
   return r;
 }
 Array.prototype.groupBy = function(prop : string) : object{
+  let __buildKey = (target:any) => prop.split(',')
+                                       .map((f) => target[f])
+                                       .join('__');
   return this.reduce(function(groups : any, item : any) {
-    var val = item[prop];
-    (groups[val] = groups[val] || []).push(item);
+    var key = __buildKey(item);
+    (groups[key] = groups[key] || []).push(item);
     return groups;
   }, {});
 }
@@ -347,6 +361,10 @@ Array.prototype.split = function (size: number) {
                     }, []);
 }
 
+Array.prototype.includes = Array.prototype.includes || function (searchElement, fromIndex) {
+  return this.indexOf(searchElement) != -1;
+}
+
 NodeList.prototype.toArray = function (){
-  return Array.from(this);
+  return Array.from ? Array.from(this) : core.toArray(this);
 }

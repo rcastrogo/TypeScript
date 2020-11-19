@@ -7,17 +7,11 @@ var core_declarative_1 = require("../../lib/core.declarative");
 var core_pub_sub_1 = require("../../lib/core.pub-sub");
 var pub_sub_view_ts_html_1 = require("./pub-sub-view.ts.html");
 var core_include_1 = require("../../lib/core.include");
-var PubSubView = /** @class */ (function () {
-    // ============================================================
-    // Constructor
-    // ============================================================
+var PubSubView = (function () {
     function PubSubView() {
         this._config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
         this._config.write('PubSubView', Date.now.toString());
     }
-    // ============================================================
-    // Render
-    // ============================================================
     PubSubView.prototype.render = function (target) {
         var _this = this;
         this._content = core_1.core.build('div', { innerHTML: pub_sub_view_ts_html_1.default }, true);
@@ -44,13 +38,3 @@ var PubSubView = /** @class */ (function () {
     return PubSubView;
 }());
 exports.PubSubView = PubSubView;
-//pubSub.subscribe( pubSub.TOPICS.NOTIFICATION, (a:any, b:any, c:any) => {
-//  console.log(a, b, c);
-//  console.log(core.getValue('location'));
-//  console.log('Resultado: {0|toUpperCase}'.format('hola'));
-//  include('js/rafa.js').then(() => {
-//    var __lib = (window as any).__rafa;
-//    __lib.write('55544');
-//  });
-//});
-//  pubSub.publish(pubSub.TOPICS.NOTIFICATION, 'Hola Caracola from app-component', 25);

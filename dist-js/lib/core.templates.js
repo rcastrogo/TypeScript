@@ -40,9 +40,6 @@ function merge(template, o, HTMLElemnt) {
 exports.merge = merge;
 function fillTemplate(e, scope) {
     var _root = e;
-    // ==============================================================================
-    // Elementos en este nivel
-    // ==============================================================================
     var _repeaters = _root.querySelectorAll('[xfor]')
         .toArray();
     var _repeatersElements = _repeaters.reduce(function (a, r) {
@@ -53,13 +50,7 @@ function fillTemplate(e, scope) {
         .filter(function (x) { return !_repeatersElements.includes(x); });
     if (_root.attributes.getNamedItem('xbind'))
         _elements.push(_root);
-    // ==============================================================================
-    // Procesado de los elementos
-    // ==============================================================================
     _elements.forEach(function (child) {
-        // ============================================================================
-        // Visibilidad del elemento. Ej: xif="index"
-        // ============================================================================
         if (child.attributes.getNamedItem('xif')) {
             var fn = new Function('ctx', 'return {0};'.format(child.attributes
                 .getNamedItem('xif')
@@ -67,22 +58,13 @@ function fillTemplate(e, scope) {
                 .replaceAll('@', 'this.'));
             child.style.display = fn.apply(scope) ? '' : 'none';
         }
-        // ============================================================================
-        // Atributos que es necesario procesar. Ej: id="txt-{index}"
-        // ============================================================================
         core_1.core.toArray(child.attributes)
             .where({ value: /{[^{]+?}/g })
             .map(function (a) { return a.value = merge(a.value, scope); });
-        // ============================================================================
-        // Nodos texto de este elemento
-        // ============================================================================
         core_1.core.toArray(child.childNodes)
             .where({ nodeType: 3 })
             .where({ textContent: /{[^{]+?}/g })
             .forEach(function (text) { return text.textContent = merge(text.textContent, scope, text); });
-        // ============================================================================
-        // Propiedades que establecer
-        // ============================================================================
         String.trimValues(child.attributes
             .getNamedItem('xbind')
             .value
@@ -93,11 +75,6 @@ function fillTemplate(e, scope) {
             var _a = String.trimValues(token.split(':')), name = _a[0], params = _a[1];
             var _b = String.trimValues(params.split(/=>/)), prop_name = _b[0], _params = _b[1];
             var _value = core_1.core.getValue(prop_name, scope);
-            // ==========================================================================
-            // _value es una funci�n de transformaci�n:
-            // xbind="textContent:Data.toUpper => @Other A 5"
-            // Que recibir�: Data.toUpper(scope.Other, 'A', '5', child)
-            // ==========================================================================
             if (core_1.core.isFunction(_value)) {
                 var _args = String.trimValues((_params || '').split(/\s|#/))
                     .reduce(function (a, p) {
@@ -112,9 +89,6 @@ function fillTemplate(e, scope) {
                 child[name] = _value;
         });
     });
-    // ====================================================================
-    // Procesado de los repeaters
-    // ====================================================================
     _repeaters.map(function (repeater) {
         var _a = String.trimValues(repeater.attributes
             .getNamedItem('xfor')

@@ -10,18 +10,12 @@ var core_tabbly_loader_1 = require("../../lib/core.tabbly.loader");
 var tabbly_reports_view_ts_html_1 = require("./tabbly-reports-view.ts.html");
 var core_include_1 = require("../../lib/core.include");
 var core_pub_sub_1 = require("../../lib/core.pub-sub");
-var TabblyReportsView = /** @class */ (function () {
-    // ============================================================
-    // Constructor
-    // ============================================================
+var TabblyReportsView = (function () {
     function TabblyReportsView() {
         this._config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
         this._config.write('TabblyReportsView', Date.now.toString());
         this._content = core_1.core.build('div', { innerHTML: tabbly_reports_view_ts_html_1.default }, true);
     }
-    // ============================================================
-    // Render
-    // ============================================================
     TabblyReportsView.prototype.render = function (target) {
         var _this = this;
         target.innerHTML = '';
@@ -44,16 +38,10 @@ var TabblyReportsView = /** @class */ (function () {
             .forEach(function (e) { return e.e.innerHTML = w3CodeColorize(e.e.innerHTML, e.mode); });
     };
     TabblyReportsView.prototype.__loadReport = function (target) {
-        // ==========================================================================
-        // Definición del informe
-        // ==========================================================================
         core_ajax_1.ajax.get('./js/pro-0001.txt')
             .then(function (res) {
             var __rd = core_tabbly_loader_1.loader.load(res);
             core_pub_sub_1.default.publish('msg/rpt/definition', res);
-            // ====================================================================
-            // Datos del informe
-            // ====================================================================
             core_ajax_1.ajax.get('./js/data/proveedores.json')
                 .then(function (res) {
                 core_pub_sub_1.default.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));

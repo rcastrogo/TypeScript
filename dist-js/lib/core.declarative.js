@@ -22,9 +22,6 @@ function addEventListeners(container, handlers, context) {
                 return;
             var value = e.attributes.getNamedItem(name).value;
             var tokens = value.split(':');
-            // =============================================================
-            // on-click
-            // =============================================================
             if (index === 0) {
                 var fn_1 = handlers[tokens[0]] ||
                     core_1.core.getValue(tokens[0], context);
@@ -40,9 +37,6 @@ function addEventListeners(container, handlers, context) {
                 };
                 return;
             }
-            // =============================================================
-            // on-publish
-            // =============================================================
             if (index === 1) {
                 var topic = core_1.core.getValue(tokens[0], core_pub_sub_1.default);
                 topic = topic === window ? tokens[0] : topic;
@@ -61,26 +55,11 @@ function addEventListeners(container, handlers, context) {
                     }
                 });
             }
-            // =============================================================
-            // route-link
-            // =============================================================
             if (index === 2) {
                 e.onclick = function (e) {
-                    //             let router = context.router;
-                    //             let route = router.normalizePath(e.target.href);
-                    //             if (router.current != route) {
-                    //               try {
-                    //                 router.navigateTo(route);
-                    //               } catch (error) {
-                    //                 console.log(error);
-                    //               }
-                    //             }
                     return false;
                 };
             }
-            // ====================================================================
-            // on-change
-            // ====================================================================
             if (index === 3) {
                 var select = e.tagName === 'SELECT';
                 if (value === 'publish') {

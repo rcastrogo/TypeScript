@@ -5,6 +5,7 @@ __core.ajax           = require('./core.ajax');
 __core.commands       = require('./core.commands');
 __core.declarative    = require('./core.declarative');
 __core.dialogs        = require('./core.dialogs');
+__core.events         = require('./core.events');
 __core.include        = require('./core.include');
 __core.paginator      = require('./core.paginator');
 __core.pubSub         = require('./core.pub-sub');
@@ -14,7 +15,11 @@ __core.reportEngine   = require('./core.tabbly.loader');
 __core.jsReportLoader = require('./core.tabbly.v2.engine');
 __core.jsReportEngine = require('./core.tabbly.v2.loader');
 __core.version        = require('./version.ts.html');
-__core.controls       = { grid       : require('./controls.editable-grid'),
-                          textViewer : require('./controls.text-viewer')}
+__core.controls       = { 
+  grid       : require('./controls.editable-grid'),
+  textViewer : require('./controls.text-viewer'),
+  collapsibleBox : require('./controls.collapsible-box')
+};
+__core.tre            = require('./core.tree');
 
 module.exports = __core;

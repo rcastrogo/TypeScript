@@ -1,9 +1,8 @@
 "use strict";
-// ts-nocheck
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.core = void 0;
 var tslib_1 = require("tslib");
-var Core = /** @class */ (function () {
+var Core = (function () {
     function Core() {
     }
     Core.prototype.isNull = function (v) { return v === null; };
@@ -23,7 +22,7 @@ var Core = /** @class */ (function () {
                     a[p] = this.clone(b[p]);
                 }
                 else if (this.isObject(b[p])) {
-                    this.apply(a[p] = a[p] || {}, b[p]); // apply(o[p], c[p] 
+                    this.apply(a[p] = a[p] || {}, b[p]);
                 }
                 else {
                     a[p] = b[p];
@@ -105,9 +104,6 @@ var Core = /** @class */ (function () {
             if (b === 'this')
                 return a;
             var name = b;
-            // =====================================================
-            // Prototype libro.name|htmlDecode,p1,p2,...
-            // =====================================================
             var apply_proto = b.indexOf('|') > -1;
             var arg = [];
             if (apply_proto) {
@@ -116,23 +112,14 @@ var Core = /** @class */ (function () {
                 arg = String.trimValues(tokens[1].split(','));
             }
             var value = a[name];
-            // =====================================================
-            // Buscar la propiedad en un ambito superior si existe
-            // =====================================================
             if (value === undefined && a.outerScope) {
                 value = exports.core.getValue(name, a.outerScope);
             }
-            // =====================================================
-            // Existe el valor. Se le aplica el prototipo si procede
-            // =====================================================
             if (value != undefined) {
                 return apply_proto ? value.__proto__[arg[0]]
                     .apply(value, arg.slice(1))
                     : value;
             }
-            // =====================================================
-            // window/self o cadena vac�a
-            // =====================================================
             return a === self ? '' : self;
         }, scope || self);
     };
@@ -150,9 +137,6 @@ String.leftPad = function (val, size, ch) {
 String.trimValues = function (values) {
     return values.map(function (s) { return s.trim(); });
 };
-// =================================================================================================
-// Strings.prototype
-// =================================================================================================
 String.prototype.format = function () {
     var values = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -183,14 +167,10 @@ String.prototype.format = function () {
         else {
             value = exports.core.getValue(key, __context);
         }
-        // fn(scope.Other, 'A', '5')
-        // fnName:@window.location.href;A;5
         if (exports.core.isFunction(value)) {
             return __call_fn(value, fnName ? fnName.split(/\s|\;/)
                 : [], []);
         }
-        // Data.toUpper(value, scope.Other, 'A', '5')
-        // name:Data.toUpper=>@Other;A;5
         if (fnName) {
             var _b = String.trimValues(fnName.split(/=>/)), name_2 = _b[0], params = _b[1];
             return __call_fn(exports.core.getValue(name_2, __context), params ? params.split(/\s|\;/) : [], [value]);
@@ -224,9 +204,6 @@ String.prototype.htmlDecode = function () {
         .documentElement
         .textContent;
 };
-// =================================================================================================
-// Array.prototype
-// =================================================================================================
 Array.prototype.remove = function (o) {
     var index = this.indexOf(o);
     if (index != -1)

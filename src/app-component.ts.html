@@ -2,7 +2,7 @@
   <div class="w3-teal w3-padding">TypeScript-app</div>
 	<div class="w3-bar w3-black w3-card">
     <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-HOME"><i class="fa fa-home" aria-hidden="true"></i></button>
-    <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-TABLES">Tablas</button>
+    <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-TABLES">Tablas-ListView</button>
     <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-PUB-SUB">Pub-Sub</button>
     <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-COMMANDS">Commands</button>
     <button class="w3-bar-item w3-button tablink" on-click="openLink:VIEW-REPORTS">Reports</button>
@@ -25,7 +25,13 @@
       <p>
         Prueba de concepto de un framework para el desarrollo de aplicaciones con TypeScript.
       </p>
+      <button class="w3-button w3-border" on-click="doAction:tree">core.tree</button>
     </div>
+
+
+
+    <div class="w3-container" on-publish="msg/main-page/test/content"></div>
+
   </div>
 
 </div>

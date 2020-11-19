@@ -1,0 +1,33 @@
+﻿<div class="">
+
+  <div header class="w3-bar w3-border-bottom ">
+    <button class="w3-button w3-xlarge w3-left fa fa-th-large w3-border-right" 
+            style="padding: 7px 4px;" 
+            title="Rejilla"
+            on-click="doAction:grid"
+            on-publish="msg/view/change:syncViewButtons:grid"></button>
+    <button class="w3-button w3-xlarge w3-left fa fa-bars w3-border-right" 
+            style="padding: 7px 4px;" 
+            title="Lista" 
+            on-click="doAction:list"
+            on-publish="msg/view/change:syncViewButtons:list"></button>
+
+    <span xbind="innerHTML:title" class="w3-left" style="padding:6px 0 4px 8px;"></span>
+
+    <button class="w3-button w3-xlarge w3-right fa fa-plus w3-border-left" style="padding: 7px 4px;" title="Insertar" on-click="doAction:new"></button>
+    <button class="w3-button w3-xlarge w3-right fa fa-trash w3-border-left" style="padding: 7px 4px;" title="Eliminar" on-click="doAction:delete"></button>
+    <button class="w3-button w3-xlarge w3-right fa fa-edit w3-border-left" style="padding: 9px 4px 5px 4px;" title="Editar" on-click="doAction:edit"></button>
+
+    <button on-click="doAction:last" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10095;&#10095;</button>
+    <button on-click="doAction:next" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10095;</button>
+    <input on-change="doGoToPage" xbind="value:currentPage" class="w3-right w3-center" style="width: 3em;padding:8px; border:none" />
+    <button on-click="doAction:previous" class="w3-button w3-right w3-border-left w3-border-right" style="padding: 8px;">&#10094;</button>
+    <button on-click="doAction:first" class="w3-button w3-right w3-border-left" style="padding: 8px;">&#10094;&#10094;</button>
+
+  </div>
+
+  <div list-view-body style="overflow:auto">
+
+  </div>
+
+</div>

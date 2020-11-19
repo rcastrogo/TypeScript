@@ -7,18 +7,12 @@ var core_declarative_1 = require("../../lib/core.declarative");
 var table_component_1 = require("./table-component");
 var tables_view_ts_html_1 = require("./tables-view.ts.html");
 var core_include_1 = require("../../lib/core.include");
-var TablesView = /** @class */ (function () {
-    // ============================================================
-    // Constructor
-    // ============================================================
+var TablesView = (function () {
     function TablesView() {
         this._config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
         this._config.write('TablesView', Date.now.toString());
         this._content = core_1.core.build('div', { innerHTML: tables_view_ts_html_1.default }, true);
     }
-    // ============================================================
-    // Render
-    // ============================================================
     TablesView.prototype.render = function (target) {
         var _this = this;
         target.innerHTML = '';

@@ -10,10 +10,7 @@ var core_templates_1 = require("../../lib/core.templates");
 var core_pub_sub_1 = require("../../lib/core.pub-sub");
 var table_component_ts_html_1 = require("./table-component.ts.html");
 var ROWS_PER_PAGE = 4;
-var ProveedoresPageComponent = /** @class */ (function () {
-    // ============================================================================================
-    // Constructor
-    // ============================================================================================
+var ProveedoresPageComponent = (function () {
     function ProveedoresPageComponent() {
         this._sortBy = '';
         this._desc = false;
@@ -52,15 +49,6 @@ var ProveedoresPageComponent = /** @class */ (function () {
         }, {});
         return this;
     };
-    // ============================================================================================
-    // Carga de datos
-    // ============================================================================================
-    //async loadData() {
-    //  var res = await ajax.get('js/data/proveedores.json') as string;
-    //  this._sortBy = '_nombre';
-    //  this.proveedores = JSON.parse(res).orderBy(this._sortBy);
-    //  this.goToPage('first');
-    //}
     ProveedoresPageComponent.prototype.loadData = function () {
         var _this = this;
         this.syncTitle();
@@ -72,9 +60,6 @@ var ProveedoresPageComponent = /** @class */ (function () {
             _this.goToPage('first');
         });
     };
-    // =====================================================================================
-    // Paginación
-    // =====================================================================================
     ProveedoresPageComponent.prototype.goToPage = function (page) {
         var __page = ~~page;
         if (page === 'current')
@@ -131,9 +116,6 @@ var ProveedoresPageComponent = /** @class */ (function () {
             this.goToPage((__page + 1).toString());
         }
     };
-    // ============================================================================================
-    // Ordenación
-    // ============================================================================================
     ProveedoresPageComponent.prototype.doSort = function (field) {
         if (this._sortBy && this._sortBy == field) {
             this._desc = !this._desc;
@@ -145,13 +127,7 @@ var ProveedoresPageComponent = /** @class */ (function () {
         this.proveedores = this.proveedores.sortBy(field, this._desc);
         this.goToPage('first');
     };
-    // ===========================================================
-    // Acciones sobre los elementos, paginación, etc...
-    // ===========================================================
     ProveedoresPageComponent.prototype.doAction = function (value) {
-        // =========================================================
-        // Paginación
-        // =========================================================
         if (value.name === 'page')
             return this.goToPage(value.data);
         if (value.name === 'first' ||
@@ -159,44 +135,26 @@ var ProveedoresPageComponent = /** @class */ (function () {
             value.name === 'next' ||
             value.name === 'last')
             return this.goToPage(value.name);
-        // =========================================================
-        // Check/Uncheck
-        // =========================================================
         if (value.name === 'check-item') {
             var target = this.paginationInfo.visibleItems[value.data];
             target.__checked = !target.__checked;
             this.syncTitle();
         }
-        // =========================================================
-        // Borrado
-        // =========================================================
         if (value.name === 'delete')
             return this.delete();
-        // =========================================================
-        // Nuevo
-        // =========================================================
         if (value.name === 'new')
             return this.insert();
-        // =========================================================
-        // Edición (Seleccionado)
-        // =========================================================
         if (value.name === 'edit') {
             var __checkedItems = this.paginationInfo.getChecked();
             if (__checkedItems.length == 0)
                 return;
             return this.edit(__checkedItems[0].item);
         }
-        // =========================================================
-        // Edición (link)
-        // =========================================================
         if (value.name === 'edit-row') {
             var __id = ~~value.data;
             var __target = this.proveedores.where({ _id: __id })[0];
             return this.edit(__target);
         }
-        // =================================================================================
-        // Buscar
-        // =================================================================================
         if (value.name === 'search') {
             if (value.data) {
                 this.proveedores = this.proveedores
@@ -208,9 +166,6 @@ var ProveedoresPageComponent = /** @class */ (function () {
             return this.loadData();
         }
     };
-    // ============================================================================================
-    // Borrado de elementos
-    // ============================================================================================
     ProveedoresPageComponent.prototype.delete = function () {
         var _this = this;
         var __checkedItems = this.paginationInfo.getChecked();
@@ -244,9 +199,6 @@ var ProveedoresPageComponent = /** @class */ (function () {
                 _descripcion: core_1.core.$('txt-descripcion').value,
                 _fechaDeAlta: ''
             };
-            //this.apiService
-            //    .post(__payload)
-            //    .subscribe((result: Proveedor) => {
             var result = { _id: 56, _nif: 'aaaa', _nombre: 'rrr', _descripcion: 'rrr', _fechaDeAlta: '01/02/2020' };
             _this.current = result;
             _this.proveedores.push(result);
@@ -255,15 +207,9 @@ var ProveedoresPageComponent = /** @class */ (function () {
             dlg.close();
             _this.proveedores = _this.proveedores.sortBy(_this._sortBy, _this._desc);
             _this.goToPageOf(result);
-            //},
-            //error => this.showError(error)
-            //);
         });
         this._dialog.style.display = 'block';
     };
-    // ============================================================================================
-    // Edición de elementos
-    // ============================================================================================
     ProveedoresPageComponent.prototype.edit = function (target) {
         var _this = this;
         this._dialog = this._dialog || core_1.core.$('proveedor-edit-dialog');
@@ -283,17 +229,11 @@ var ProveedoresPageComponent = /** @class */ (function () {
                 _descripcion: core_1.core.$('txt-descripcion').value,
                 _fechaDeAlta: ''
             };
-            //this.apiService
-            //    .put(__payload)
-            //    .subscribe((result: Proveedor) => {
             _this.current._nif = __payload._nif;
             _this.current._nombre = __payload._nombre;
             _this.current._descripcion = __payload._descripcion;
             _this._dialog.style.display = 'none';
             dlg.close();
-            //},
-            //  error => this.showError(error)
-            //);
         });
         this._dialog.style.display = 'block';
     };

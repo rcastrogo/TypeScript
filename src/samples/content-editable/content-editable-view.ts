@@ -1,15 +1,14 @@
 ﻿
-import HTML from './content-editable-view.ts.html';
-import { core} from '@src/core';
-import { addEventListeners } from '@src/core.declarative';
-import { Command, CommandManager } from '@src/core.commands';
 import { Constants } from '@src/../app.constants';
-import { fillTemplate } from '@src/core.templates';
-import include from '@src/core.include'; 
-import pubSub from '@src/core.pub-sub';
+import { CollapsibleBox } from '@src/controls.collapsible-box';
 import * as grid from '@src/controls.editable-grid';
 import { TextViewer } from '@src/controls.text-viewer';
+import { core } from '@src/core';
 import { ajax } from '@src/core.ajax';
+import { addEventListeners } from '@src/core.declarative';
+import pubSub from '@src/core.pub-sub';
+import { fillTemplate } from '@src/core.templates';
+import HTML from './content-editable-view.ts.html';
 
 
 export class ContentEditableView {
@@ -92,7 +91,23 @@ export class ContentEditableView {
     ajax.get('./js/pro-0001.txt')
         .then((res:string) => {
           this._textViewer.setContent(res);
+          this._textViewer.onclick.add( (sender:string, args:any) => {
+            console.log(sender, args);
+          });
         });
+    // ================================================================================================
+    // Ejemplo de collapsibleBox
+    // ================================================================================================
+    let c = new CollapsibleBox('Mensajes').appendTo(this._content)
+                                          .setContent(this._content
+                                                          .querySelector<HTMLElement>('[log]'));
+    c.onexpand.add( (eventName:string, sender:CollapsibleBox) => {
+      //sender.setContent('');
+    });
+    c.getControl().classList.add('w3-margin');
+
+    setTimeout(() => c.expand(), 5000);
+
   }
 
 }

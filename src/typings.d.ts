@@ -3,6 +3,10 @@ declare module '*.html' {
   const content: string;
   export default content;
 }
+declare module '*.css' {
+  const content: string;
+  export default content;
+}
 
 declare interface Config {
   write(key:string, value:string): Config;

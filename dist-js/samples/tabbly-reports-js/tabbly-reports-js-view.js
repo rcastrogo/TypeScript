@@ -10,18 +10,12 @@ var core_tabbly_v2_engine_1 = require("../../lib/core.tabbly.v2.engine");
 var core_tabbly_v2_loader_1 = require("../../lib/core.tabbly.v2.loader");
 var tabbly_reports_js_view_ts_html_1 = require("./tabbly-reports-js-view.ts.html");
 var core_pub_sub_1 = require("../../lib/core.pub-sub");
-var TabblyReportsJsView = /** @class */ (function () {
-    // ============================================================
-    // Constructor
-    // ============================================================
+var TabblyReportsJsView = (function () {
     function TabblyReportsJsView() {
         this._config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
         this._config.write('TabblyReportsJsView', Date.now.toString());
         this._content = core_1.core.build('div', { innerHTML: tabbly_reports_js_view_ts_html_1.default }, true);
     }
-    // ============================================================
-    // Render
-    // ============================================================
     TabblyReportsJsView.prototype.render = function (target) {
         var _this = this;
         target.innerHTML = '';
@@ -44,26 +38,16 @@ var TabblyReportsJsView = /** @class */ (function () {
             .forEach(function (e) { return e.e.innerHTML = w3CodeColorize(e.e.innerHTML, e.mode); });
     };
     TabblyReportsJsView.prototype.__loadReport = function (target) {
-        // =========================================================================
-        // Receptor de mensajes
-        // =========================================================================
         var __handler = {
             buffer: '',
             send: function (data) { this.buffer += data; },
             message: function (message) {
-                //console.log(message); 
             },
             flush: function () { },
             clear: function () { this.buffer = ''; }
         };
-        // =========================================================================
-        // Cargar el informe
-        // =========================================================================
         core_include_1.default('./js/pro-0001.js').then(function (cancel) {
             var __rd = __reportDefinition(core_tabbly_v2_loader_1.loader, core_1.core);
-            // =======================================================================
-            // Cargar los datos
-            // =======================================================================
             core_ajax_1.ajax.get('./js/data/proveedores.json')
                 .then(function (res) {
                 __handler.clear();

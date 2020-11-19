@@ -2,15 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EditableGrid = void 0;
 var core_pub_sub_1 = require("./core.pub-sub");
-var EditableGrid = /** @class */ (function () {
+var EditableGrid = (function () {
     function EditableGrid(table, onFocus, onChange) {
         var _this = this;
         this.currentIndex = -1;
         this.previous = undefined;
         this.table = table;
-        // =======================================================
-        // Onfocus
-        // =======================================================
         var __onfocus = function (e) {
             var __td = e.target;
             var __tr = __td.parentNode;
@@ -26,9 +23,6 @@ var EditableGrid = /** @class */ (function () {
             if (onFocus)
                 onFocus(_this, __eventArg);
         };
-        // =======================================================
-        // Onblur
-        // =======================================================
         var __onblur = function (e) {
             var __td = e.target;
             var __tr = __td.parentNode;
@@ -48,18 +42,12 @@ var EditableGrid = /** @class */ (function () {
             }
             ;
         };
-        // =======================================================
-        // Celdas editables
-        // =======================================================
         table.querySelectorAll('td[contenteditable]')
             .toArray()
             .forEach(function (e) {
             e.onblur = __onblur;
             e.onfocus = __onfocus;
         });
-        // =======================================================
-        // onkeypress : Evitar multiples l�neas
-        // =======================================================
         table.onkeypress = function (e) {
             if (e.keyCode == 13) {
                 if (e.preventDefault)
@@ -67,9 +55,6 @@ var EditableGrid = /** @class */ (function () {
                 return false;
             }
         };
-        // =======================================================================================================================
-        // onkeydown : Cambio de celda activa
-        // =======================================================================================================================
         table.onkeydown = function (e) {
             var __res = true;
             var __sender = e.target;
@@ -86,15 +71,15 @@ var EditableGrid = /** @class */ (function () {
                     __res = false;
                 };
                 if (e.keyCode == 13)
-                    __focus(table, __row.rowIndex, __td.cellIndex + 1); // Next
+                    __focus(table, __row.rowIndex, __td.cellIndex + 1);
                 if (e.keyCode == 38 && __row.rowIndex > 1)
-                    __focus(table, __row.rowIndex - 1, __td.cellIndex); // Up
+                    __focus(table, __row.rowIndex - 1, __td.cellIndex);
                 if (e.keyCode == 40 && __row.rowIndex < table.rows.length - 1)
-                    __focus(table, __row.rowIndex + 1, __td.cellIndex); // Down                         
+                    __focus(table, __row.rowIndex + 1, __td.cellIndex);
                 if (e.keyCode == 39 && __pos == __sender.textContent.length)
-                    __focus(table, __row.rowIndex, __td.cellIndex + 1); // Right
+                    __focus(table, __row.rowIndex, __td.cellIndex + 1);
                 if (e.keyCode == 37 && __pos == 0)
-                    __focus(table, __row.rowIndex, __td.cellIndex - 1); // Left
+                    __focus(table, __row.rowIndex, __td.cellIndex - 1);
             }
             return __res;
         };

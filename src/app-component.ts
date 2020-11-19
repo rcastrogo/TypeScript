@@ -10,6 +10,7 @@ import { TabblyReportsView } from './samples/tabbly-reports/tabbly-reports-view'
 import { TablesView } from './samples/tables/tables-view';
 import { ContentEditableView } from './samples/content-editable/content-editable-view';
 import { Constants } from './app.constants';
+import { TreeAction } from './samples/tree';
 
 
 
@@ -37,6 +38,9 @@ export function appComponent(container:HTMLElement){
       if(viewId == 'VIEW-REPORTS-V2') new TabblyReportsV2View().render(__view_container);
       if(viewId == 'VIEW-REPORTS-JS') new TabblyReportsJsView().render(__view_container);
       if(viewId == 'VIEW-CONTENT-EDITABLE') new ContentEditableView().render(__view_container);
+    },
+    doAction: (sender:HTMLButtonElement, event:MouseEvent, action: string) => {
+      new TreeAction().run();
     }
   }, { });
 

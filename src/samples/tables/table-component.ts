@@ -292,7 +292,7 @@ export class ProveedoresPageComponent {
   // ============================================================================================
   private edit(target: any) {
 
-    this._dialog = this._dialog || core.$<HTMLElement>('proveedor-edit-dialog');
+    this._dialog = this._dialog || core.$<HTMLElement>('proveedor-edit-dialog')[0];
     this.current = target;
 
     DialogHelper.getWrapper('dialog-container')        
