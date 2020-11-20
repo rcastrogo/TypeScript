@@ -361,6 +361,7 @@ Array.prototype.split = function (size: number) {
                     }, []);
 }
 
+// IE11
 Array.prototype.includes = Array.prototype.includes || function (searchElement, fromIndex) {
   return this.indexOf(searchElement) != -1;
 }
@@ -368,3 +369,6 @@ Array.prototype.includes = Array.prototype.includes || function (searchElement, 
 NodeList.prototype.toArray = function (){
   return Array.from ? Array.from(this) : core.toArray(this);
 }
+
+// IE11
+Object.entries = Object.entries || ((o: { [s: string]: {} }) => Object.keys(o).map<[string, any]>( k => [k, o[k]]));  

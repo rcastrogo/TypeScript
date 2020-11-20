@@ -47,7 +47,7 @@ var TabblyReportsView = (function () {
                 core_pub_sub_1.default.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));
                 new core_tabbly_engine_1.ReportEngine()
                     .fromReportDefinition(__rd, JSON.parse(res), function (html) {
-                    target.append(core_1.core.build('div', { innerHTML: html }, true));
+                    target.appendChild(core_1.core.build('div', { innerHTML: html }, true));
                     core_declarative_1.addEventListeners(target, {}, __rd.getContext());
                 });
             });

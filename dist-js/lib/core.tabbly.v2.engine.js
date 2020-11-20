@@ -8,7 +8,8 @@ var ReportEngine = (function () {
     }
     ReportEngine.prototype.generateReport = function (rd, data, mediator) {
         var __that = this;
-        mediator.clear();
+        if (mediator.clear)
+            mediator.clear();
         mediator.message({ type: 'report.begin' });
         var __rd = rd;
         var __dataSet = __rd.parseData ? __rd.parseData(__rd, data, mediator.message)
@@ -222,7 +223,8 @@ var ReportEngine = (function () {
         __grandTotalSections();
         mediator.message({ type: 'report.render.end' });
         mediator.message({ type: 'report.end' });
-        mediator.flush();
+        if (mediator.flush)
+            mediator.flush();
     };
     ReportEngine.prototype.merge = function (template, o) {
         return template.replace(/{([^{]+)?}/g, function (m, key) {

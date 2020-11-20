@@ -16,8 +16,8 @@ __core.jsReportLoader = require('./core.tabbly.v2.engine');
 __core.jsReportEngine = require('./core.tabbly.v2.loader');
 __core.controls       = { 
   grid       : require('./controls.editable-grid'),
-  textViewer : require('./controls.text-viewer',
-  collapsibleBox : require('./controls.collapsible-box'))
+  textViewer : require('./controls.text-viewer'),
+  collapsibleBox : require('./controls.collapsible-box')
 };
 __core.tre            = require('./core.tree');
 

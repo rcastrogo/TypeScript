@@ -32,51 +32,54 @@ export class EditableGrid {
     // Onfocus
     // =======================================================
     let __onfocus = (e:FocusEvent) => {
-      var __td = e.target as HTMLTableCellElement;
-      var __tr = __td.parentNode as HTMLTableRowElement;
-      this.previous = __td.textContent.trim();
+      var __div = e.target as HTMLDivElement;
+      var __td  = __div.parentNode as HTMLTableCellElement;
+      var __tr  = __td.parentNode as HTMLTableRowElement;
+      this.previous = __div.textContent.trim();
       this.currentIndex = __tr.rowIndex;
       let __eventArg = { 
         tr     : __tr, 
         td     : __td, 
-        target : __td,
+        target : __div,
         current: this.previous
       }
       pubsub.publish(EditableGrid.OnfocusMessage, __eventArg);
       if(onFocus) onFocus(this, __eventArg);
     } 
-    // =======================================================
+    // ===========================================================
     // Onblur
-    // =======================================================
-    let __onblur= (e:FocusEvent) => {          
-      var __td  = e.target as HTMLTableCellElement;
+    // ===========================================================
+    let __onblur = (e:FocusEvent) => {      
+      var __div = e.target as HTMLDivElement;
+      var __td  = __div.parentNode as HTMLTableCellElement;
       var __tr  = __td.parentNode as HTMLTableRowElement;     
       if( this.previous != undefined && 
           this.previous != __td.textContent.trim()){
         let __eventArg = { 
           tr       : __tr, 
           td       : __td, 
-          target   : __td, 
+          target   : __div, 
           previous : this.previous,
-          current  : __td.textContent.trim()
+          current  : __div.textContent.trim()
         };
         pubsub.publish(EditableGrid.OnChangeMessage, __eventArg);
         if(onChange) onChange(this, __eventArg);          
         this.previous = undefined;                
-      };     
+      };
+      __div.style.outline = '1px solid transparent';
     }         
-    // =======================================================
+    // ===========================================================
     // Celdas editables
-    // =======================================================
-    table.querySelectorAll<HTMLElement>('td[contenteditable]')
+    // ===========================================================
+    table.querySelectorAll<HTMLElement>('td div[contenteditable]')
          .toArray()
          .forEach(e => {
       e.onblur  = __onblur;
       e.onfocus = __onfocus; 
     });   
-    // =======================================================
+    // ===========================================================
     // onkeypress : Evitar multiples líneas
-    // =======================================================
+    // ===========================================================
     table.onkeypress = function(e){                            
       if(e.keyCode==13){                   
         if(e.preventDefault) e.preventDefault();        
@@ -89,13 +92,16 @@ export class EditableGrid {
     table.onkeydown = function(e){
       var __res = true;
       var __sender = e.target as Element;
-      if(__sender.tagName=='TD' && [13, 37, 38, 39, 40].indexOf(e.keyCode) > -1){           
-        var __td  = __sender as HTMLTableCellElement;
-        var __row = __sender.parentNode as HTMLTableRowElement; 
+      if(__sender.tagName=='DIV' && [13, 37, 38, 39, 40].indexOf(e.keyCode) > -1){ 
+        var __div = __sender as HTMLDivElement;
+        var __td  = __div.parentNode as HTMLTableCellElement;
+        var __row = __td.parentNode as HTMLTableRowElement; 
         var __pos = window.getSelection().getRangeAt(0).startOffset;            
         var __focus = function(t:HTMLTableElement, r:number, c:number) {
           e.preventDefault();
-          try{t.rows[r].cells[c].focus();} catch(e){}
+          try{
+            (t.rows[r].cells[c].firstElementChild as HTMLDivElement).focus();
+          } catch(e){}
           __res = false;
         };
         if (e.keyCode == 13)                                         __focus(table, __row.rowIndex, __td.cellIndex+1);  // Next

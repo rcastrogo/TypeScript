@@ -48,10 +48,13 @@ export class TreeAction {
                         '  {innerHTML}' + 
                         '<h5 class="w3-right-align">{parent.parent.name} > {parent.name} > {name} {children.length} grupos</h5>' +
                         '</div>';
-    var __html = TreeUtils.treeToHtml(__data,
-                                      node_template,
-                                      leaf_template);
-    pubSub.publish('msg/main-page/test/content', __html);
+
+    pubSub.publish(
+      'msg/main-page/test/content',
+      '<p>Generación de contenido a partir de datos agrupados</p>' +
+      TreeUtils.treeToHtml(__data,
+                           node_template,
+                           leaf_template));
   }
  
 }

@@ -49,7 +49,7 @@ export class ContentEditableView {
         e.innerHTML = value;
       },
       doSave: () => {
-        let data = target.querySelectorAll<HTMLTableCellElement>('td[data-index]')
+        let data = target.querySelectorAll<HTMLTableCellElement>('td div[data-index]')
                          .toArray()
                          .map(c => c.textContent)
                          .split(2)
@@ -71,15 +71,15 @@ export class ContentEditableView {
       // onFocus
       // ===========================================================================
       (sender, event) => {
-        event.td.style.outline   = '0px solid transparent';
-        let message = 'onfocus -> [{td.dataset.index}, {td.cellIndex}] id: {tr.id}';
+        event.target.style.outline   = '1px solid gray';
+        let message = 'onfocus -> [{target.dataset.index}, {td.cellIndex}] id: {tr.id}';
         pubSub.publish('msg/log', message.format(event));
       },
       // ===========================================================================
       // onChange
       // ===========================================================================
       (sender, event) => {
-        let message = 'onChange -> [{td.dataset.index}, {td.cellIndex}] ' +
+        let message = 'onChange -> [{target.dataset.index}, {td.cellIndex}] ' +
                       'id: {tr.id} [ {previous} -> {current}]';
         pubSub.publish('msg/log', message.format(event));  
       });

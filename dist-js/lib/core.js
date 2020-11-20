@@ -6,7 +6,7 @@ var Core = (function () {
     function Core() {
     }
     Core.prototype.isNull = function (v) { return v === null; };
-    Core.prototype.toArray = function (v) { return Array.from(v); };
+    Core.prototype.toArray = function (v) { return Array.from ? Array.from(v) : Array.prototype.slice.call(v); };
     Core.prototype.isArray = function (v) { return Array.isArray(v); };
     Core.prototype.isString = function (v) { return typeof v == 'string'; };
     Core.prototype.isBoolean = function (v) { return typeof v == 'boolean'; };
@@ -67,6 +67,16 @@ var Core = (function () {
         if (__targets.length)
             return __targets.toArray();
         return null;
+    };
+    ;
+    Core.prototype.element = function (idOrSelector, targets) {
+        return (document.getElementById(idOrSelector) ||
+            this.elements(idOrSelector, targets)[0]);
+    };
+    ;
+    Core.prototype.elements = function (selector, targets) {
+        return (targets || document).querySelectorAll(selector)
+            .toArray();
     };
     ;
     Core.prototype.build = function (tagName, options, firstElementChild) {
@@ -204,6 +214,7 @@ String.prototype.htmlDecode = function () {
         .documentElement
         .textContent;
 };
+String.prototype.startsWith = String.prototype.startsWith || function (t) { return this.indexOf(t) == 0; };
 Array.prototype.remove = function (o) {
     var index = this.indexOf(o);
     if (index != -1)
@@ -297,9 +308,12 @@ Array.prototype.distinct = function (sentence) {
     return r;
 };
 Array.prototype.groupBy = function (prop) {
+    var __buildKey = function (target) { return prop.split(',')
+        .map(function (f) { return target[f]; })
+        .join('__'); };
     return this.reduce(function (groups, item) {
-        var val = item[prop];
-        (groups[val] = groups[val] || []).push(item);
+        var key = __buildKey(item);
+        (groups[key] = groups[key] || []).push(item);
         return groups;
     }, {});
 };
@@ -333,6 +347,10 @@ Array.prototype.split = function (size) {
         return acc;
     }, []);
 };
-NodeList.prototype.toArray = function () {
-    return Array.from(this);
+Array.prototype.includes = Array.prototype.includes || function (searchElement, fromIndex) {
+    return this.indexOf(searchElement) != -1;
 };
+NodeList.prototype.toArray = function () {
+    return Array.from ? Array.from(this) : exports.core.toArray(this);
+};
+Object.entries = Object.entries || (function (o) { return Object.keys(o).map(function (k) { return [k, o[k]]; }); });

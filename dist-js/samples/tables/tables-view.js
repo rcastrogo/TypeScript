@@ -7,6 +7,8 @@ var core_declarative_1 = require("../../lib/core.declarative");
 var table_component_1 = require("./table-component");
 var tables_view_ts_html_1 = require("./tables-view.ts.html");
 var core_include_1 = require("../../lib/core.include");
+var controls_collapsible_box_1 = require("../../lib/controls.collapsible-box");
+var list_view_component_1 = require("./list-view-component");
 var TablesView = (function () {
     function TablesView() {
         this._config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
@@ -24,13 +26,22 @@ var TablesView = (function () {
                     .then(function () { return e.innerHTML = w3CodeColorize(e.innerHTML, mode); });
             }
         }, {});
-        var __container = this._content
-            .querySelector('[table-container]');
         new table_component_1.ProveedoresPageComponent()
-            .renderTo(__container)
+            .renderTo(core_1.core.element('[table-container]', this._content))
             .loadData();
+        controls_collapsible_box_1.CollapsibleBox.create('Listview', '-')
+            .appendTo(core_1.core.element('[list-view-container]', this._content))
+            .onexpand.add(this.__loadListview);
         core_include_1.default('./js/w3codecolor.js')
             .then(function () { return _this.__colorize(); });
+    };
+    TablesView.prototype.__loadListview = function (event, sender) {
+        if (sender.loaded)
+            return;
+        sender.loaded = true;
+        new list_view_component_1.ListViewComponent()
+            .renderTo(sender.getBody())
+            .loadData();
     };
     TablesView.prototype.__colorize = function () {
         this._content

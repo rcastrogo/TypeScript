@@ -9,7 +9,8 @@ function addEventListeners(container, handlers, context) {
     var fn = {
         innerHTML: function (e, value, mode) { return e.innerHTML = value; },
         innerText: function (e, value, mode) { return e.innerText = value; },
-        className: function (e, value) { return e.className = value; }
+        className: function (e, value) { return e.className = value; },
+        append: function (e, value, mode) { return e.innerHTML += value; },
     };
     EVENTS.forEach(function (selector, index) {
         container

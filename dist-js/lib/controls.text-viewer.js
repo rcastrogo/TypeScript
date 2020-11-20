@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TextViewer = void 0;
 var core_1 = require("./core");
+var core_events_1 = require("./core.events");
 var controls_text_viewer_ts_css_1 = require("./controls.text-viewer.ts.css");
 var __data_Uri = 'data:text/css;base64,' + window.btoa(controls_text_viewer_ts_css_1.default);
 var __template = '<div class="scv_Main">' +
@@ -35,8 +36,10 @@ var TextViewer = (function () {
                 .querySelector('.scv_LineContainer')
                 .style.left = '{0}px'.format(__target.scrollLeft);
         };
+        this.onclick = new core_events_1.CoreEvent('txt-viewer.onclick');
     }
     TextViewer.prototype.setContent = function (value) {
+        var _this = this;
         this._control
             .querySelector('.scv_LineContainer')
             .innerHTML = value.replace(/(\r\n|\r|\n)/mg, '\n')
@@ -44,6 +47,7 @@ var TextViewer = (function () {
             .reduce(function (a, _, i) { return a += (i + 1) + '<br/>'; }, '');
         var __div = this._control.querySelector('.scv_TextContainer');
         __div.textContent = value;
+        __div.onclick = function (e) { return _this.onclick.dispatch(e); };
         return this;
     };
     TextViewer.prototype.getControl = function () {

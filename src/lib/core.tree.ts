@@ -6,10 +6,8 @@ import { core } from './core';
 export class TreeUtils {
 
   public static createTree(data:any[], propertyNames:string[]):any {
-    let groups = data.groupBy(propertyNames.join(',')) as any;
-    
-    return Object.keys(groups)
-                 .map( k => [k, groups[k]]) //  Object.entries(groups)
+    let groups = data.groupBy(propertyNames.join(',')) as any; 
+    return Object.entries(groups)
                  .reduce( (node:any, group:any) => {
                    group[0].split('__')
                            .reduce((node:any, level:string, i:number, self:string[]) => {

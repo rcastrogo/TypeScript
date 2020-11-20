@@ -9,7 +9,9 @@ function addEventListeners(container:HTMLElement, handlers:any, context:any) {
   let fn = {
     innerHTML : (e:HTMLElement, value:string, mode:string) => e.innerHTML = value,
     innerText : (e:HTMLElement, value:string, mode:string) => e.innerText = value,
-    className : (e:HTMLElement, value:string) => e.className = value } as any
+    className : (e:HTMLElement, value:string) => e.className = value,
+    append    : (e:HTMLElement, value:string, mode:string) => e.innerHTML += value,
+  } as any
   
   EVENTS.forEach((selector, index) => {
     container

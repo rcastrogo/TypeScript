@@ -7,18 +7,40 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <script src="pol.bundle.min.js"></script>
   <script src="rcg.bundle.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style>
-
+    .svc_viewer { position:relative; height:200px; }
   </style>
   <script>
+
+    window.onload = function () {
+      var __viewer1 = new pol.controls.textViewer.TextViewer();
+      var __viewer2 = new rcg.controls.textViewer.TextViewer();
+
+      document.body.appendChild(__viewer1.getControl());
+      document.body.appendChild(__viewer2.getControl());
+
+      __viewer1.setContent(JSON.stringify(pol, null, 2));
+      __viewer2.setContent(JSON.stringify(rcg, null, 2));
+
+      var __collapsibleBox1 = new rcg.controls
+                                     .collapsibleBox
+                                     .CollapsibleBox('rcg.controls.collapsibleBox', '', undefined, '200px');
+      __collapsibleBox1.setContent(__viewer1.getControl());
+      __collapsibleBox1.appendTo(document.body);
+
+      var __collapsibleBox2 = new pol.controls
+                                     .collapsibleBox
+                                     .CollapsibleBox('pol.controls.collapsibleBox', '', undefined, '200px');
+      __collapsibleBox2.setContent(__viewer2.getControl());
+      __collapsibleBox2.appendTo(document.body);
+
+    }
 
   </script>
 </head>
 <body>
-   <script>
-     document.write(JSON.stringify(pol));
-     document.write('<br/>');
-     document.write(JSON.stringify(rcg));
-   </script>
+
 </body>
 </html>

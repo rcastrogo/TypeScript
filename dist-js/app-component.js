@@ -12,6 +12,7 @@ var tabbly_reports_view_1 = require("./samples/tabbly-reports/tabbly-reports-vie
 var tables_view_1 = require("./samples/tables/tables-view");
 var content_editable_view_1 = require("./samples/content-editable/content-editable-view");
 var app_constants_1 = require("./app.constants");
+var tree_1 = require("./samples/tree");
 function appComponent(container) {
     var _config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
     container.innerHTML = app_component_ts_html_1.default;
@@ -39,6 +40,9 @@ function appComponent(container) {
                 new tabbly_reports_js_view_1.TabblyReportsJsView().render(__view_container);
             if (viewId == 'VIEW-CONTENT-EDITABLE')
                 new content_editable_view_1.ContentEditableView().render(__view_container);
+        },
+        doAction: function (sender, event, action) {
+            new tree_1.TreeAction().run();
         }
     }, {});
     _config.write('LastUsed', Date.now.toString());

@@ -53,7 +53,7 @@ var TabblyReportsV2View = (function () {
             core_ajax_1.ajax.get('./js/data/proveedores.json')
                 .then(function (res) {
                 new core_tabbly_v2_engine_1.ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
-                target.append(core_1.core.build('div', { innerHTML: __handler.buffer }));
+                target.appendChild(core_1.core.build('div', { innerHTML: __handler.buffer }));
                 core_declarative_1.addEventListeners(target, {}, __rd.getContext());
                 core_pub_sub_1.default.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));
             });

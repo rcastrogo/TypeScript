@@ -73,7 +73,7 @@ export class TabblyReportsV2View {
           ajax.get('./js/data/proveedores.json')
               .then((res:string) => {
                 new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
-                target.append(core.build('div', { innerHTML : __handler.buffer }));
+                target.appendChild(core.build('div', { innerHTML : __handler.buffer }));
 
                 addEventListeners(target, {}, __rd.getContext()); 
                 pubSub.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));

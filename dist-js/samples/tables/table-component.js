@@ -212,7 +212,7 @@ var ProveedoresPageComponent = (function () {
     };
     ProveedoresPageComponent.prototype.edit = function (target) {
         var _this = this;
-        this._dialog = this._dialog || core_1.core.$('proveedor-edit-dialog');
+        this._dialog = this._dialog || core_1.core.$('proveedor-edit-dialog')[0];
         this.current = target;
         core_dialogs_1.DialogHelper.getWrapper('dialog-container')
             .setTitle('Edición de proveedores')

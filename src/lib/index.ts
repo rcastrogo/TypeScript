@@ -20,6 +20,6 @@ __core.controls       = {
   textViewer : require('./controls.text-viewer'),
   collapsibleBox : require('./controls.collapsible-box')
 };
-__core.tre            = require('./core.tree');
+__core.tree           = require('./core.tree');
 
 module.exports = __core;

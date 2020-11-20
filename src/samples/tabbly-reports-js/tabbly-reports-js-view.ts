@@ -71,7 +71,7 @@ export class TabblyReportsJsView {
           .then((res:string) => {
             __handler.clear()
             new ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
-            target.append(core.build('div', { innerHTML : __handler.buffer }));
+            target.appendChild(core.build('div', { innerHTML : __handler.buffer }));
             addEventListeners(target, {}, __rd.getContext());
             cancel();
             pubSub.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));
