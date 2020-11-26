@@ -1,15 +1,16 @@
 ﻿
 import HTML from './app-component.ts.html';
+import { Constants } from './app.constants';
 import { core } from './lib/core';
 import { addEventListeners } from './lib/core.declarative';
+import { BarChartAction, PieChartAction, SvgBarChartAction } from './samples/charts';
 import { CommandsView } from './samples/commands/commands-view';
+import { ContentEditableView } from './samples/content-editable/content-editable-view';
 import { PubSubView } from './samples/pub-sub/pub-sub-view';
 import { TabblyReportsJsView } from './samples/tabbly-reports-js/tabbly-reports-js-view';
 import { TabblyReportsV2View } from './samples/tabbly-reports-v2/tabbly-reports-v2-view';
 import { TabblyReportsView } from './samples/tabbly-reports/tabbly-reports-view';
 import { TablesView } from './samples/tables/tables-view';
-import { ContentEditableView } from './samples/content-editable/content-editable-view';
-import { Constants } from './app.constants';
 import { TreeAction } from './samples/tree';
 
 
@@ -40,7 +41,10 @@ export function appComponent(container:HTMLElement){
       if(viewId == 'VIEW-CONTENT-EDITABLE') new ContentEditableView().render(__view_container);
     },
     doAction: (sender:HTMLButtonElement, event:MouseEvent, action: string) => {
-      new TreeAction().run();
+      if(action == 'tree') return new TreeAction().run();
+      if(action == 'bar') return new BarChartAction().run();
+      if(action == 'svg-bar') return new SvgBarChartAction().run();
+      if(action == 'pie') return new PieChartAction().run();
     }
   }, { });
 

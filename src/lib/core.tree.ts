@@ -1,8 +1,6 @@
 import { executeTemplate } from './core.templates';
 import { core } from './core';
 
-
-
 export class TreeUtils {
 
   public static createTree(data:any[], propertyNames:string[]):any {

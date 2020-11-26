@@ -73,7 +73,7 @@ class Core implements CoreConstructor{
                                 .toArray();
   };
 
-  build(tagName : string, options : object, firstElementChild?: boolean): HTMLElement {
+  build(tagName : string, options : string | object, firstElementChild?: boolean): HTMLElement {
     let o = this.isString(options) ? { innerHTML : options } : options;
     let e = this.apply(document.createElement(tagName), o);
     return firstElementChild ? e.firstElementChild : e;  

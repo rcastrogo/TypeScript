@@ -37,7 +37,7 @@ function merge(template: string, o: any, HTMLElemnt?:HTMLElement) {
   return __result;
 }
 
-function fillTemplate(e:HTMLElement, scope:any) {
+function fillTemplate(e:HTMLElement, scope:any):HTMLElement {
   var _root = e as HTMLElement;
   // ==============================================================================
   // Elementos en este nivel
