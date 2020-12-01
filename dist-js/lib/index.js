@@ -16,7 +16,8 @@ __core.version = require('./version.ts.html');
 __core.controls = {
     grid: require('./controls.editable-grid'),
     textViewer: require('./controls.text-viewer'),
-    collapsibleBox: require('./controls.collapsible-box')
+    collapsibleBox: require('./controls.collapsible-box'),
+    charts: require('./charts/charts')
 };
-__core.tre = require('./core.tree');
+__core.tree = require('./core.tree');
 module.exports = __core;

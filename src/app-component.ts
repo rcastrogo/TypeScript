@@ -3,7 +3,7 @@ import HTML from './app-component.ts.html';
 import { Constants } from './app.constants';
 import { core } from './lib/core';
 import { addEventListeners } from './lib/core.declarative';
-import { BarChartAction, PieChartAction, SvgBarChartAction } from './samples/charts';
+import { BarChartAction, LineChartAction, PieChartAction, SvgBarChartAction } from './samples/charts';
 import { CommandsView } from './samples/commands/commands-view';
 import { ContentEditableView } from './samples/content-editable/content-editable-view';
 import { PubSubView } from './samples/pub-sub/pub-sub-view';
@@ -41,10 +41,11 @@ export function appComponent(container:HTMLElement){
       if(viewId == 'VIEW-CONTENT-EDITABLE') new ContentEditableView().render(__view_container);
     },
     doAction: (sender:HTMLButtonElement, event:MouseEvent, action: string) => {
-      if(action == 'tree') return new TreeAction().run();
-      if(action == 'bar') return new BarChartAction().run();
+      if(action == 'tree')    return new TreeAction().run();
+      if(action == 'bar')     return new BarChartAction().run();
       if(action == 'svg-bar') return new SvgBarChartAction().run();
-      if(action == 'pie') return new PieChartAction().run();
+      if(action == 'pie')     return new PieChartAction().run();
+      if(action == 'lines')   return new LineChartAction().run();
     }
   }, { });
 

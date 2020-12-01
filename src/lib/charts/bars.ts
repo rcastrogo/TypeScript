@@ -1,9 +1,18 @@
-import { createColors, niceScale } from '@src/charts/utils';
-import { Box, Rectangle } from '@src/math';
-import { core } from '@src/core';
+import { createColors, PathBuilder, niceScale } from './utils';
+import { Box, Rectangle, Vector2 } from '../math';
+import { core } from '../core';
 
 const STEPS_SCALE_Y = 25;
 const COLORS = createColors(30); 
+
+export interface BarChartOptions {
+  padding?:Box;
+  showBars?:boolean;
+  showDots?:boolean;
+  showLine?:boolean;
+  showValues?:boolean;
+  closeLines?:boolean;
+}
 
 export default class BarChart {
 
@@ -20,6 +29,7 @@ export default class BarChart {
   private showDots = true;
   private showLine = true;
   private showValues = true;
+  private closeLines = true;
 
   private svg:SVGElement;
   private ratio:number;
@@ -31,38 +41,42 @@ export default class BarChart {
   public constructor(width:number, 
                      height:number, 
                      data:Array<Array<any>>, 
-                     padding?:Box,
-                     showBars = true,
-                     showDots = true,
-                     showLine = true,
-                     showValues = true) {
-    // ==========================================================================
+                     o:BarChartOptions) {
+    // ====================================================================
     // Comportamiento
-    // ==========================================================================
-    this.showBars = showBars;
-    this.showDots = showDots;
-    this.showLine = showLine;
-    this.showValues = showValues;
-    // ==========================================================================
+    // ====================================================================
+    this.showBars = o && o.showBars != undefined ? o.showBars : true;
+    this.showDots = o && o.showDots != undefined ? o.showDots : true;
+    this.showLine = o && o.showLine != undefined ? o.showLine : true;
+    this.showValues = o && o.showValues != undefined ? o.showValues : true;
+    this.closeLines = o && o.closeLines != undefined ? o.closeLines : true;
+    // ====================================================================
     // Inicializar posición y tamaño
-    // ==========================================================================
+    // ====================================================================
     this.width   = width;
     this.height  = height;
-    this.padding = padding || new Box(0, 0, 0, 0);
+    this.padding = (o && o.padding) ? o.padding : new Box(0, 0, 0, 0);
     this.bounds  = new Rectangle(
       this.padding.left, 
       this.padding.top, 
       this.width  - this.padding.left - this.padding.right,
       this.height - this.padding.top - this.padding.bottom);
-    // ==========================================================================
+    // ====================================================================
     // Crear el elemento SVG
-    // ==========================================================================
-    var __html = ('<svg width="{width}"' + 
-                  '     height="{height}">' +
+    // ====================================================================
+    var __html = ('<svg viewbox ="0 0 {width} {height}">' +
+                  '  <defs>' +
+                  '    <clipPath id="JJJ">' +
+                  '      <rect y="{bounds.top}"' + 
+                  '            x="{bounds.left}"' + 
+                  '            width="{bounds.width}"' + 
+                  '            height="{0}" />' +
+                  '     </clipPath>' +
+                  '  </defs>' +
                   '  <g class="lines"></g>' +
-                  '  <g class="data"></g>' +
+                  '  <g class="data" style="clip-path:url(#JJJ)"></g>' +
                   '  <g class="text"></g>' +
-                  '</svg>').format(this)
+                  '</svg>').format(this.bounds.height - 1, this)
     this.svg = core.build('div', __html, true) as any;
     // ==========================================================================
     // Inicializar los datos
@@ -115,11 +129,11 @@ export default class BarChart {
 
     var __totalBarWidth = this.bounds.width / this.data.length;
     var __margin        = __totalBarWidth * .1;
-    var __marginSerie   = __margin * 10;
+    var __marginSerie   = __margin * 2;
     var __barWidth      = __totalBarWidth - __margin / this.data.length;
     var __offset        = 0;
 
-    let __createBars = (rows:any[]) => {
+    let __computeBars = (rows:any[]) => {
       rows.forEach( (value:any, i:number, self) => {
         var __height = this.worldToScreenY(value.value);
         var __top    = this.bounds.top + this.bounds.height - __height;
@@ -134,12 +148,13 @@ export default class BarChart {
       this.series
           .forEach((serie) => {
             serie.left = this.bounds.left + __offset;
-            __createBars(serie.rows);
+            __computeBars(serie.rows);
             __offset += __marginSerie;
             serie.width = this.bounds.left + __offset - serie.left;
+            serie.right = this.bounds.left + __offset - __marginSerie;
       });
     } else {
-      __createBars(this.data);  
+      __computeBars(this.data);  
     }  
     this.draw();
   }
@@ -148,9 +163,9 @@ export default class BarChart {
   // draw
   // =====================================================================
   private draw(){    
+    this.drawAxisY();
     this.drawVerticalLines();
     this.drawAxisX();
-    this.drawAxisY();
     this.drawBars(); 
     this.drawLine();
     this.drawSeries();
@@ -176,12 +191,7 @@ export default class BarChart {
   // drawAxisY
   // =====================================================================
   private drawAxisY() {
-    let __html = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}"' + 
-                 '      stroke="black"' + 
-                 '      stroke-width="2" />';
-    __html = __html.format(this.bounds.left, 
-                           this.bounds.top - 2, 
-                           this.bounds.top + this.bounds.height + 4);
+    let __html     = '';
     let __template = '<line x1="{0}" y1="{1}" x2="{2}" y2="{1}"' + 
                      '      stroke="silver"' + 
                      '      stroke-width="1"/>';
@@ -193,13 +203,19 @@ export default class BarChart {
         let __height = this.worldToScreenY(value);
         let __top    = this.bounds.top + this.bounds.height - __height;
         if(__top < this.bounds.top) return;
-        __html += __template.format(this.bounds.left, 
+        __html += __template.format(this.bounds.left - 4, 
                                     __top, 
                                     this.bounds.left + this.bounds.width);
 
         this.appendText(this.bounds.left - 6, __top + 4, value.toFixed(0));
     });
     this.restoreContext();
+    __html += ('<line x1="{0}" y1="{1}" x2="{0}" y2="{2}"' + 
+               '      stroke="black"' + 
+               '      stroke-width="2" />').format(
+                        this.bounds.left, 
+                        this.bounds.top - 2, 
+                        this.bounds.top + this.bounds.height + 4);
     this.svg
         .querySelector<SVGGElement>('g.lines')
         .insertAdjacentHTML("beforeend", __html);
@@ -286,53 +302,64 @@ export default class BarChart {
     this.restoreContext();
   }
 
-  // =========================================================================================
+  // ===================================================================================
   // drawDots
-  // =========================================================================================
+  // ===================================================================================
   private drawLine(){
 
-    let __template = '<circle cx="{0}" cy="{1}" r="5" ' + 
-                     '        stroke="black"' + 
-                     '        stroke-width="2" ' + 
-                     '        fill="white" />';
+    let __dots_template = '<circle cx="{0}" cy="{1}" r="3" ' + 
+                          '        stroke="black"' + 
+                          '        stroke-width="1" ' + 
+                          '        fill="white" />';
 
-    let __createDots = (values:Array<any>) => {
-      // Valores ============================================================================
+    let __createDots = (values:Array<any>, extra:Vector2[]) => {
+      // Valores =======================================================================
       if (this.showLine && this.showValues) {
         values.forEach((item:any, i:number) => {  
                         var rec = item.bar as Rectangle;
-                        this.appendText(rec.centerPoint().x, rec.top - 12, item.value);      
+                        this.appendText(rec.centerPoint().x, rec.top - 12, item.value); 
                       });
       }
-      // Linea ==============================================================================
-      let __line = values.reduce((path:string, item:any, i:number) => {
-                            var rec = item.bar as Rectangle;
-                            return path += '{0}{1},{2}'.format(i == 0 ? 'M' : 'L',
-                                                               rec.centerPoint().x, 
-                                                               rec.top);
-                          }, '<path d="') + 
-                          '" fill="none"' + 
-                          '  stroke-dasharray="5,5"' + 
-                          '  stroke="gray"' + 
-                          '  stroke-width="2"/>';
-      // Puntos =============================================================================
-      let __points = values.reduce((html:string, item:any, i:number) => {  
-                              var rec = item.bar as Rectangle;                            
-                              return html += __template.format(rec.centerPoint().x, 
-                                                               rec.top,
-                                                               item.fill);        
-                            }, '');
+      // Linea =========================================================================
+      let __points = values.map( v => v.bar as Rectangle)
+                           .map( r => new Vector2(r.centerPoint().x, r.top))
+                           .concat(this.closeLines ? extra: []);
+      let __path = PathBuilder.createPath(__points, .1, this.closeLines)
+      let __line = ('<path d="{0}" fill="{1}"' + 
+                    '      stroke-dasharray=""' + 
+                    '      stroke="{2}"' + 
+                    '      stroke-width="2"/>'
+                   ).format(__path, 
+                            this.closeLines ? COLORS.next() : 'none', 
+                            'black');
+      // Puntos ========================================================================
+      let __dots = values.reduce((html:string, item:any, i:number) => {  
+                            var rec = item.bar as Rectangle;                            
+                            return html += __dots_template.format(rec.centerPoint().x, 
+                                                                  rec.top,
+                                                                  item.fill);        
+                         }, '');
       return (this.showLine ? __line : '') + 
-             (this.showDots ? __points : '');
+             (this.showDots ? __dots : '');
     }
 
     let __html = '';
     if (this.series.length) {
       __html = this.series
-                   .map((serie) => __createDots(serie.rows))
+                   .map((serie) => {
+                      let extra = [ new Vector2(serie.right, 
+                                                this.bounds.top + this.bounds.height),
+                                    new Vector2(serie.left, 
+                                                this.bounds.top + this.bounds.height)];
+                     return __createDots(serie.rows, extra);
+                   })
                    .join('');     
     } else {
-      __html =  __createDots(this.data);  
+      let extra = [ new Vector2(this.bounds.left + this.bounds.width, 
+                                this.bounds.top + this.bounds.height),
+                    new Vector2(this.bounds.left, 
+                                this.bounds.top + this.bounds.height)];
+      __html =  __createDots(this.data, extra);  
     } 
 
     this.svg

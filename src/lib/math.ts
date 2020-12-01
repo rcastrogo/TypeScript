@@ -140,6 +140,13 @@ function Radians(degrees:number) { return degrees * Math.PI / 180; };
 function Degrees(radians:number) { return radians * 180 / Math.PI; };
 function IsPowerOfTwo(value:number){ return value > 0 && (value & (value - 1)) == 0; };
 function NextPowerOfTwo(value:number){  var k = 1; while (k < value) k *= 2;  return k; };
+function polarToCartesian(x:number, y:number, r:number, angleInDegrees:number){
+  var __angleInRadians = Radians(angleInDegrees);
+  return {
+    x: x + (r * Math.cos(__angleInRadians)),
+    y: y + (r * Math.sin(__angleInRadians))
+  };
+}
 
 
 export {
@@ -150,6 +157,7 @@ export {
   Clamp,
   Radians,
   Degrees,
+  polarToCartesian,
   IsPowerOfTwo,
   NextPowerOfTwo
 }

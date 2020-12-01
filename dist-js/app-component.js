@@ -2,16 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.appComponent = void 0;
 var app_component_ts_html_1 = require("./app-component.ts.html");
+var app_constants_1 = require("./app.constants");
 var core_1 = require("./lib/core");
 var core_declarative_1 = require("./lib/core.declarative");
+var charts_1 = require("./samples/charts");
 var commands_view_1 = require("./samples/commands/commands-view");
+var content_editable_view_1 = require("./samples/content-editable/content-editable-view");
 var pub_sub_view_1 = require("./samples/pub-sub/pub-sub-view");
 var tabbly_reports_js_view_1 = require("./samples/tabbly-reports-js/tabbly-reports-js-view");
 var tabbly_reports_v2_view_1 = require("./samples/tabbly-reports-v2/tabbly-reports-v2-view");
 var tabbly_reports_view_1 = require("./samples/tabbly-reports/tabbly-reports-view");
 var tables_view_1 = require("./samples/tables/tables-view");
-var content_editable_view_1 = require("./samples/content-editable/content-editable-view");
-var app_constants_1 = require("./app.constants");
 var tree_1 = require("./samples/tree");
 function appComponent(container) {
     var _config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
@@ -42,7 +43,16 @@ function appComponent(container) {
                 new content_editable_view_1.ContentEditableView().render(__view_container);
         },
         doAction: function (sender, event, action) {
-            new tree_1.TreeAction().run();
+            if (action == 'tree')
+                return new tree_1.TreeAction().run();
+            if (action == 'bar')
+                return new charts_1.BarChartAction().run();
+            if (action == 'svg-bar')
+                return new charts_1.SvgBarChartAction().run();
+            if (action == 'pie')
+                return new charts_1.PieChartAction().run();
+            if (action == 'lines')
+                return new charts_1.LineChartAction().run();
         }
     }, {});
     _config.write('LastUsed', Date.now.toString());

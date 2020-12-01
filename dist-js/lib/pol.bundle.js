@@ -18,13 +18,758 @@ __core.jsReportEngine = require('./core.tabbly.v2.loader');
 __core.controls       = { 
   grid       : require('./controls.editable-grid'),
   textViewer : require('./controls.text-viewer'),
-  collapsibleBox : require('./controls.collapsible-box')
+  collapsibleBox : require('./controls.collapsible-box'),
+  charts: require('./charts/charts')
 };
 __core.tre            = require('./core.tree');
 
 module.exports = __core;
 
-},{"./controls.collapsible-box":2,"./controls.editable-grid":3,"./controls.text-viewer":4,"./core":12,"./core.ajax":6,"./core.commands":7,"./core.declarative":8,"./core.dialogs":9,"./core.events":10,"./core.include":11,"./core.paginator":13,"./core.pub-sub":14,"./core.tabbly.engine":15,"./core.tabbly.loader":16,"./core.tabbly.v2.engine":17,"./core.tabbly.v2.loader":18,"./core.templates":19,"./core.tree":20}],2:[function(require,module,exports){
+},{"./charts/charts":3,"./controls.collapsible-box":6,"./controls.editable-grid":7,"./controls.text-viewer":8,"./core":16,"./core.ajax":10,"./core.commands":11,"./core.declarative":12,"./core.dialogs":13,"./core.events":14,"./core.include":15,"./core.paginator":17,"./core.pub-sub":18,"./core.tabbly.engine":19,"./core.tabbly.loader":20,"./core.tabbly.v2.engine":21,"./core.tabbly.v2.loader":22,"./core.templates":23,"./core.tree":24}],2:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils_1 = require("./utils");
+var math_1 = require("../math");
+var core_1 = require("../core");
+var STEPS_SCALE_Y = 25;
+var COLORS = utils_1.createColors(30);
+var BarChart = (function () {
+    function BarChart(width, height, data, o) {
+        var _this = this;
+        this.showBars = true;
+        this.showDots = true;
+        this.showLine = true;
+        this.showValues = true;
+        this.closeLines = true;
+        this.worldToScreenY = function (y) { return y * _this.ratio * _this.bounds.height / 100; };
+        this.getControl = function () { return _this.svg; };
+        this.fonts = [];
+        this.currentFont = { fontFamily: 'Verdana',
+            fontSize: '11px',
+            textAnchor: 'middle' };
+        this.showBars = o && o.showBars != undefined ? o.showBars : true;
+        this.showDots = o && o.showDots != undefined ? o.showDots : true;
+        this.showLine = o && o.showLine != undefined ? o.showLine : true;
+        this.showValues = o && o.showValues != undefined ? o.showValues : true;
+        this.closeLines = o && o.closeLines != undefined ? o.closeLines : true;
+        this.width = width;
+        this.height = height;
+        this.padding = (o && o.padding) ? o.padding : new math_1.Box(0, 0, 0, 0);
+        this.bounds = new math_1.Rectangle(this.padding.left, this.padding.top, this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom);
+        var __html = ('<svg viewbox ="0 0 {width} {height}">' +
+            '  <defs>' +
+            '    <clipPath id="JJJ">' +
+            '      <rect y="{bounds.top}"' +
+            '            x="{bounds.left}"' +
+            '            width="{bounds.width}"' +
+            '            height="{0}" />' +
+            '     </clipPath>' +
+            '  </defs>' +
+            '  <g class="lines"></g>' +
+            '  <g class="data" style="clip-path:url(#JJJ)"></g>' +
+            '  <g class="text"></g>' +
+            '</svg>').format(this.bounds.height - 1, this);
+        this.svg = core_1.core.build('div', __html, true);
+        this.data = data.map(function (values, i) {
+            return {
+                value: values[0],
+                legend: values[1] || '',
+                serie: values[2] || '',
+                fill: values[3] || COLORS.next()
+            };
+        });
+        this.maxValue = 1.05 * this.data.reduce(function (a, d) { return Math.max(d.value, a); }, -Infinity);
+        this.ratio = 100.0 / this.maxValue;
+        this.series = Object.entries(this.data.groupBy('serie'))
+            .map(function (group) {
+            return { key: group[0],
+                text: group[0],
+                fill: group[1][0].fill,
+                rows: group[1] };
+        })
+            .where(function (s) { return s.key; });
+        this.legends = Object.entries(this.data.groupBy('legend'))
+            .map(function (group) {
+            var __rows = group[1];
+            var __color = __rows[0].fill;
+            if (_this.series.length) {
+                __rows.forEach(function (r) { return r.fill = __color; });
+            }
+            return { key: group[0],
+                text: group[0],
+                fill: __color,
+                rows: __rows };
+        });
+        this.calcLayout();
+    }
+    BarChart.prototype.calcLayout = function () {
+        var _this = this;
+        var __totalBarWidth = this.bounds.width / this.data.length;
+        var __margin = __totalBarWidth * .1;
+        var __marginSerie = __margin * 2;
+        var __barWidth = __totalBarWidth - __margin / this.data.length;
+        var __offset = 0;
+        var __computeBars = function (rows) {
+            rows.forEach(function (value, i, self) {
+                var __height = _this.worldToScreenY(value.value);
+                var __top = _this.bounds.top + _this.bounds.height - __height;
+                var __left = _this.bounds.left + __margin + __offset;
+                ;
+                value.bar = new math_1.Rectangle(__left, __top, __barWidth - __margin, __height);
+                __offset += __barWidth;
+            });
+        };
+        if (this.series.length) {
+            __barWidth -= __marginSerie * (this.series.length) / this.data.length;
+            this.series
+                .forEach(function (serie) {
+                serie.left = _this.bounds.left + __offset;
+                __computeBars(serie.rows);
+                __offset += __marginSerie;
+                serie.width = _this.bounds.left + __offset - serie.left;
+                serie.right = _this.bounds.left + __offset - __marginSerie;
+            });
+        }
+        else {
+            __computeBars(this.data);
+        }
+        this.draw();
+    };
+    BarChart.prototype.draw = function () {
+        this.drawAxisY();
+        this.drawVerticalLines();
+        this.drawAxisX();
+        this.drawBars();
+        this.drawLine();
+        this.drawSeries();
+    };
+    BarChart.prototype.drawAxisX = function () {
+        var __html = ('<line x1="{0}" y1="{1}" x2="{2}" y2="{1}"' +
+            '      stroke="black"' +
+            '      stroke-width="2" />').format(this.bounds.left - 4, this.bounds.top + this.bounds.height, this.bounds.left + this.bounds.width + 4);
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    BarChart.prototype.drawAxisY = function () {
+        var _this = this;
+        var __html = '';
+        var __template = '<line x1="{0}" y1="{1}" x2="{2}" y2="{1}"' +
+            '      stroke="silver"' +
+            '      stroke-width="1"/>';
+        this.saveContext();
+        this.currentFont.textAnchor = 'end';
+        utils_1.niceScale(0, this.maxValue, STEPS_SCALE_Y)
+            .values
+            .forEach(function (value) {
+            var __height = _this.worldToScreenY(value);
+            var __top = _this.bounds.top + _this.bounds.height - __height;
+            if (__top < _this.bounds.top)
+                return;
+            __html += __template.format(_this.bounds.left - 4, __top, _this.bounds.left + _this.bounds.width);
+            _this.appendText(_this.bounds.left - 6, __top + 4, value.toFixed(0));
+        });
+        this.restoreContext();
+        __html += ('<line x1="{0}" y1="{1}" x2="{0}" y2="{2}"' +
+            '      stroke="black"' +
+            '      stroke-width="2" />').format(this.bounds.left, this.bounds.top - 2, this.bounds.top + this.bounds.height + 4);
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    BarChart.prototype.drawVerticalLines = function () {
+        var _this = this;
+        var __template = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}"' +
+            '      stroke="{3}"' +
+            '      stroke-width="1" />';
+        var __html = this.data
+            .reduce(function (html, item, i) {
+            var __point = item.bar.centerPoint();
+            return html += __template.format(__point.x, _this.bounds.top - 4, _this.bounds.top + _this.bounds.height
+                + 4, 'silver');
+        }, '') +
+            this.series
+                .reduce(function (html, serie, i, self) {
+                if (i == self.length - 1)
+                    return html;
+                return html += __template.format(serie.left + serie.width, _this.bounds.top - 4, _this.bounds.top + _this.bounds.height, 'black');
+            }, '');
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    BarChart.prototype.drawBars = function () {
+        var _this = this;
+        var __template = '<rect x="{0}" y="{1}" width="{2}" height="{3}"' +
+            '      stroke="black"' +
+            '      stroke-width="2"' +
+            '      fill="{4}"' +
+            '      data-index="{5}" />';
+        var __html = this.data
+            .reduce(function (html, item, i) {
+            var rec = item.bar;
+            _this.appendText(rec.centerPoint().x, _this.bounds.top + _this.bounds.height + 14, item.legend);
+            if (_this.showBars) {
+                if (_this.showValues)
+                    _this.appendText(rec.centerPoint().x, rec.centerPoint().y, item.value);
+                return html += __template.format(rec.left, rec.top, rec.width, rec.height, item.fill, i);
+            }
+        }, '');
+        this.svg
+            .querySelector('g.data')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    BarChart.prototype.drawSeries = function () {
+        var _this = this;
+        this.saveContext();
+        this.currentFont.fontSize = '20px';
+        this.currentFont.textAnchor = 'middle';
+        this.series
+            .forEach(function (serie, i) {
+            _this.appendText(serie.left + serie.width / 2, _this.bounds.top + _this.bounds.height + 40, serie.text);
+        });
+        this.restoreContext();
+    };
+    BarChart.prototype.drawLine = function () {
+        var _this = this;
+        var __dots_template = '<circle cx="{0}" cy="{1}" r="3" ' +
+            '        stroke="black"' +
+            '        stroke-width="1" ' +
+            '        fill="white" />';
+        var __createDots = function (values, extra) {
+            if (_this.showLine && _this.showValues) {
+                values.forEach(function (item, i) {
+                    var rec = item.bar;
+                    _this.appendText(rec.centerPoint().x, rec.top - 12, item.value);
+                });
+            }
+            var __points = values.map(function (v) { return v.bar; })
+                .map(function (r) { return new math_1.Vector2(r.centerPoint().x, r.top); })
+                .concat(_this.closeLines ? extra : []);
+            var __path = utils_1.PathBuilder.createPath(__points, .1, _this.closeLines);
+            var __line = ('<path d="{0}" fill="{1}"' +
+                '      stroke-dasharray=""' +
+                '      stroke="{2}"' +
+                '      stroke-width="2"/>').format(__path, _this.closeLines ? COLORS.next() : 'none', 'black');
+            var __dots = values.reduce(function (html, item, i) {
+                var rec = item.bar;
+                return html += __dots_template.format(rec.centerPoint().x, rec.top, item.fill);
+            }, '');
+            return (_this.showLine ? __line : '') +
+                (_this.showDots ? __dots : '');
+        };
+        var __html = '';
+        if (this.series.length) {
+            __html = this.series
+                .map(function (serie) {
+                var extra = [new math_1.Vector2(serie.right, _this.bounds.top + _this.bounds.height),
+                    new math_1.Vector2(serie.left, _this.bounds.top + _this.bounds.height)];
+                return __createDots(serie.rows, extra);
+            })
+                .join('');
+        }
+        else {
+            var extra = [new math_1.Vector2(this.bounds.left + this.bounds.width, this.bounds.top + this.bounds.height),
+                new math_1.Vector2(this.bounds.left, this.bounds.top + this.bounds.height)];
+            __html = __createDots(this.data, extra);
+        }
+        this.svg
+            .querySelector('g.data')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    BarChart.prototype.saveContext = function () {
+        this.fonts.push(core_1.core.clone(this.currentFont));
+    };
+    BarChart.prototype.restoreContext = function () {
+        if (this.fonts.length)
+            this.currentFont = this.fonts.pop();
+    };
+    BarChart.prototype.appendText = function (x, y, text) {
+        var __template = '<text x="{0}" y="{1}"' +
+            ' font-family="{fontFamily}" ' +
+            ' font-size="{fontSize}"' +
+            ' text-anchor="{textAnchor}">{2}</text>';
+        this.svg
+            .querySelector('g.text')
+            .insertAdjacentHTML("beforeend", __template.format(x, y, text, this.currentFont));
+    };
+    return BarChart;
+}());
+exports.default = BarChart;
+
+},{"../core":16,"../math":25,"./utils":5}],3:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.utils = exports.createDocument = exports.LineChart = exports.BarChart = void 0;
+var bars_1 = require("./bars");
+exports.BarChart = bars_1.default;
+var lines_1 = require("./lines");
+exports.LineChart = lines_1.default;
+var lines_2 = require("./lines");
+Object.defineProperty(exports, "createDocument", { enumerable: true, get: function () { return lines_2.createDocument; } });
+var utils = require("./utils");
+exports.utils = utils;
+
+},{"./bars":2,"./lines":4,"./utils":5}],4:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createDocument = void 0;
+var utils_1 = require("./utils");
+var math_1 = require("../math");
+var core_1 = require("../core");
+var core_pub_sub_1 = require("../core.pub-sub");
+var STEPS_SCALE_Y = 8;
+var COLORS = utils_1.createColors(30);
+var LineChart = (function () {
+    function LineChart(width, height, document, o) {
+        var _this = this;
+        this.getControl = function () { return _this.svg; };
+        this.worldToScreenX = function (x) { return _this.bounds.left + (x * _this.ratio.x * _this.bounds.width / 100); };
+        this.worldToScreenY = function (y) { return _this.bounds.top + _this.bounds.height - ((y - _this.document.view.y.min) * _this.ratio.y * _this.bounds.height / 100); };
+        this.screenToWorldX = function (x) { return _this.document.view.x.min + (x - _this.bounds.left) * 100 / (_this.bounds.width * _this.ratio.x); };
+        this.indexPoinAt = function (distance) {
+            var __i = -1;
+            _this.document.distances.forEach(function (d) { if (d > distance)
+                return; __i++; });
+            return __i;
+        };
+        this.onMouseLeave = function (eventArg) {
+            if (_this.mouse.mouseDown) {
+                _this.mouse.mouseDown = false;
+                _this.mouse.drag = false;
+            }
+        };
+        this.onTouchEnd = function (eventArg) {
+            var __reset = function () {
+                _this.mouse.mouseDown = false;
+                _this.mouse.drag = false;
+                eventArg.preventDefault();
+            };
+            if (_this.mouse.drag) {
+                core_pub_sub_1.default.publish('msg/line_chart/range', {
+                    sender: _this,
+                    start: _this.mouse.dragStart < 0 ? 0 : _this.mouse.dragStart,
+                    end: _this.mouse.dragEnd
+                });
+            }
+            else {
+                core_pub_sub_1.default.publish('msg/line_chart/tap', {
+                    sender: _this,
+                    x: _this.screenToWorldX(_this.mouse.mouseDownPosition.x)
+                });
+            }
+            __reset();
+        };
+        this.onMouseUp = function (eventArg) {
+            var __pos = { x: eventArg.offsetX, y: eventArg.offsetY };
+            var __reset = function () {
+                _this.mouse.mouseDown = false;
+                _this.mouse.drag = false;
+                eventArg.preventDefault();
+            };
+            if (_this.mouse.mouseDown && _this.mouse.mouseDownPosition.x == __pos.x
+                && _this.mouse.mouseDownPosition.y == __pos.y) {
+                core_pub_sub_1.default.publish('msg/line_chart/tap', {
+                    sender: _this,
+                    x: _this.screenToWorldX(__pos.x)
+                });
+                return __reset();
+            }
+            if (_this.mouse.drag) {
+                core_pub_sub_1.default.publish('msg/line_chart/range', {
+                    sender: _this,
+                    start: _this.mouse.dragStart < 0 ? 0 : _this.mouse.dragStart,
+                    end: _this.mouse.dragEnd
+                });
+            }
+            __reset();
+        };
+        this.onTouchStart = function (eventArg) {
+            var event = window.document.createEvent("MouseEvent");
+            var touch = eventArg.touches[0];
+            event.initMouseEvent('mousedown', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+            touch.target.dispatchEvent(event);
+            eventArg.preventDefault();
+        };
+        this.onMouseDown = function (eventArg) {
+            _this.mouse.mouseDown = true;
+            _this.mouse.mouseDownPosition = { x: eventArg.offsetX, y: eventArg.offsetY };
+            _this.mouse.dragStart = _this.mouse.dragEnd = _this.indexPoinAt(_this.screenToWorldX(_this.mouse.mouseDownPosition.x));
+            if (_this.mouse.dragStart == -1)
+                _this.mouse.dragStart = 0;
+            eventArg.preventDefault();
+        };
+        this.onTouchMove = function (eventArg) {
+            var event = window.document.createEvent("MouseEvent");
+            var touch = eventArg.touches[0];
+            event.initMouseEvent('mousemove', true, true, window, 1, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
+            touch.target.dispatchEvent(event);
+            eventArg.preventDefault();
+        };
+        this.onMouseMove = function (eventArg) {
+            var __pos = { x: eventArg.offsetX, y: eventArg.offsetY };
+            _this.mouse.drag = _this.mouse.mouseDown;
+            if (_this.mouse.drag) {
+                _this.mouse.dragEnd = _this.indexPoinAt(_this.screenToWorldX(__pos.x));
+                if (_this.mouse.dragEnd == -1)
+                    _this.mouse.dragEnd = 0;
+            }
+            eventArg.preventDefault();
+        };
+        this.states = [];
+        this.currentFont = { fontFamily: 'Verdana',
+            fontSize: '11px',
+            textAnchor: 'middle' };
+        this.mouse = {};
+        this.width = width;
+        this.height = height;
+        this.padding = (o && o.padding) ? o.padding : new math_1.Box(0, 0, 0, 0);
+        this.bounds = new math_1.Rectangle(this.padding.left, this.padding.top, this.width - this.padding.left - this.padding.right, this.height - this.padding.top - this.padding.bottom);
+        var __html = ('<svg viewbox ="0 0 {width} {height}">' +
+            '  <defs>' +
+            '    <clipPath id="JJJ">' +
+            '      <rect y="0"' +
+            '            x="{bounds.left}"' +
+            '            width="{bounds.width}"' +
+            '            height="{0}" />' +
+            '     </clipPath>' +
+            '  </defs>' +
+            '  <g class="lines"></g>' +
+            '  <g class="data" style="clip-path:url(#JJJ)"></g>' +
+            '  <g class="text"></g>' +
+            '</svg>').format(this.bounds.height + this.bounds.top - 1, this);
+        this.svg = core_1.core.build('div', __html, true);
+        this.svg.onmousemove = this.onMouseMove;
+        this.svg.onmouseup = this.onMouseUp;
+        this.svg.onmousedown = this.onMouseDown;
+        this.svg.onmouseleave = this.onMouseLeave;
+        this.svg.ontouchstart = this.onTouchStart;
+        this.svg.ontouchend = this.onTouchEnd;
+        this.svg.ontouchmove = this.onTouchMove;
+        this.document = document;
+        this.ratio = new math_1.Vector2(100.0 / this.document.view.x.range, 100.0 / this.document.view.y.range);
+        this.draw();
+    }
+    LineChart.prototype.draw = function () {
+        this.drawScaleY();
+        this.drawScaleX();
+        this.drawAxes();
+        this.drawLines();
+    };
+    LineChart.prototype.drawAxes = function () {
+        var __h_tmp = '<line x1="{0}" y1="{1}" x2="{2}" y2="{1}" stroke="black" stroke-width="2" />';
+        var __v_tmp = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}" stroke="black" stroke-width="2" />';
+        var __html = __h_tmp.format(this.bounds.left - 4, this.bounds.top + this.bounds.height, this.bounds.left + this.bounds.width + 4) +
+            __v_tmp.format(this.bounds.left, this.bounds.top - 2, this.bounds.top + this.bounds.height + 4);
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    LineChart.prototype.drawScaleY = function () {
+        var _this = this;
+        var __html = '';
+        var __template = '<line x1="{0}" y1="{1}" x2="{2}" y2="{1}" stroke="silver" stroke-width="1"/>';
+        var __right = this.bounds.left + this.bounds.width;
+        this.saveContext();
+        this.currentFont.fontSize = '9px';
+        this.currentFont.textAnchor = 'end';
+        var __serie = this.document.series[0];
+        var __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+        __scale.values
+            .forEach(function (value) {
+            var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
+            if (__y < _this.bounds.top)
+                return;
+            __html += __template.format(_this.bounds.left - 4, __y, __right);
+            var __text = '{0} {1}'.format(value.toFixed(0), (__serie.unit || 'm'));
+            _this.appendText(_this.bounds.left - 6, __y + 3, __text);
+        });
+        if (this.document.series[1]) {
+            this.currentFont.textAnchor = 'start';
+            __serie = this.document.series[1];
+            __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+            __scale.values
+                .forEach(function (value) {
+                var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
+                if (__y < _this.bounds.top ||
+                    __y > _this.bounds.top + _this.bounds.height)
+                    return;
+                __html += __template.format(__right - 4, __y, __right);
+                var __text = '{0} {1}'.format(value.toFixed(0), (__serie.unit || 'm'));
+                _this.appendText(__right + 2, __y + 3, __text);
+            });
+        }
+        this.restoreContext();
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    LineChart.prototype.drawScaleX = function () {
+        var _this = this;
+        this.saveContext();
+        var __v_tmp = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}" stroke="gray" stroke-width="1" />';
+        var __offsetX = this.worldToScreenX(this.document.view.x.min) - this.bounds.left;
+        var __html = '';
+        var __scale = utils_1.niceScale(this.document.view.x.min, this.document.view.x.max, Math.floor(this.bounds.width / 50));
+        this.currentFont.fontSize = '9px';
+        __scale.values
+            .forEach(function (value) {
+            var __x_pos = _this.worldToScreenX(value) - __offsetX;
+            if (__x_pos < _this.bounds.left ||
+                __x_pos > _this.bounds.left + _this.bounds.width)
+                return;
+            __html += __v_tmp.format(__x_pos, _this.bounds.top - 4, _this.bounds.top + _this.bounds.height + 4);
+            _this.appendText(__x_pos, _this.bounds.top + _this.bounds.height + 12, '{0} km'.format((value / 1000).toFixed(1)));
+        });
+        this.svg
+            .querySelector('g.lines')
+            .insertAdjacentHTML("beforeend", __html);
+        this.restoreContext();
+    };
+    LineChart.prototype.drawLines = function () {
+        var _this = this;
+        var __offsetX = this.worldToScreenX(this.document.view.x.min) - this.bounds.left;
+        var __html = '';
+        var __dots_template = '<circle cx="{0}" cy="{1}" r="3" ' +
+            '        stroke="black"' +
+            '        stroke-width="1" ' +
+            '        fill="white" />';
+        this.document
+            .series
+            .forEach(function (serie, i) {
+            var __points = _this.document[serie.name]
+                .map(function (v, i) {
+                var x = _this.worldToScreenX(_this.document.distances[i]);
+                var y = serie.transform ? serie.transform(_this, v)
+                    : _this.worldToScreenY(v);
+                return new math_1.Vector2(x - __offsetX, y);
+            });
+            var __points_html = __points.reduce(function (html, item, i, self) {
+                return html += __dots_template.format(item.x, item.y, 'white');
+            }, '');
+            var __y = _this.worldToScreenY(serie.view.min);
+            var __x_min = _this.worldToScreenX(_this.document.view.x.min) - __offsetX;
+            var __x_max = _this.worldToScreenX(_this.document.view.x.max) - __offsetX;
+            __points = __points.concat(serie.closeLine ? [new math_1.Vector2(__x_max, __y),
+                new math_1.Vector2(__x_min, __y)]
+                : []);
+            var __path = utils_1.PathBuilder.createPath(__points, .1, serie.closeLine);
+            var __line_html = ('<path d="{0}" fill="{1}" ' +
+                '      stroke-dasharray="" ' +
+                '      stroke="{2}" ' +
+                '      stroke-width="{3}" />').format(__path, serie.closeLine ? serie.fillStyle || COLORS.next() : 'none', serie.strokeStyle || 'black', serie.lineWidth || 1);
+            __html += __line_html + __points_html;
+        });
+        this.svg
+            .querySelector('g.data')
+            .insertAdjacentHTML("beforeend", __html);
+    };
+    LineChart.prototype.saveContext = function () {
+        this.states.push(core_1.core.clone(this.currentFont));
+    };
+    LineChart.prototype.restoreContext = function () {
+        if (this.states.length)
+            this.currentFont = this.states.pop();
+    };
+    LineChart.prototype.appendText = function (x, y, text) {
+        var __template = '<text x="{0}" y="{1}"' +
+            ' font-family="{fontFamily}" ' +
+            ' font-size="{fontSize}"' +
+            ' text-anchor="{textAnchor}">{2}</text>';
+        this.svg
+            .querySelector('g.text')
+            .insertAdjacentHTML("beforeend", __template.format(x, y, text, this.currentFont));
+    };
+    return LineChart;
+}());
+exports.default = LineChart;
+function createDocument(dataset) {
+    function __getRange(array, start, end) {
+        var __res = {
+            min: Number.POSITIVE_INFINITY,
+            max: Number.NEGATIVE_INFINITY,
+            range: undefined
+        };
+        var __current = start;
+        while (__current <= end) {
+            __res.min = Math.min(__res.min, array[__current]);
+            __res.max = Math.max(__res.max, array[__current]);
+            __current++;
+        }
+        __res.min = __res.min;
+        __res.range = __res.max - __res.min;
+        return __res;
+    }
+    var document = {
+        series: [],
+        length: dataset.streams.distance.data.length,
+        distances: dataset.streams.distance.data,
+        altitude: dataset.streams.altitude.data,
+        s2: dataset.streams.s2.data,
+        offset: 0.0,
+        view: {},
+        getRange: __getRange,
+        configureView: function (start, end) {
+            document.view.start = start;
+            document.view.end = end;
+            document.view.x = {};
+            document.view.x.max = document.distances[end] * 1.005;
+            document.view.x.min = document.distances[start];
+            document.view.x.range = document.view.x.max - document.view.x.min;
+            document.view.y = __getRange(document.altitude, start, end);
+            document.view.h = __getRange(document.s2, start, end);
+            document.series = [];
+            document.series.push({ name: 'altitude',
+                closeLine: true,
+                showDots: true,
+                unit: 'm',
+                view: document.view.y,
+                fillStyle: 'rgba(225,125,125,.8)',
+                lineWidth: 1,
+                strokeStyle: 'rgba(0,0,0,.8)',
+                ratio: 100.0 / document.view.y.range });
+            document.series.push({ name: 's2',
+                closeLine: false,
+                showDots: false,
+                unit: 'ppm',
+                view: document.view.h,
+                fillStyle: 'rgba(150,0,0,.8)',
+                lineWidth: 3,
+                strokeStyle: 'rgba(00,0,250,.9)',
+                ratio: 100.0 / document.view.h.range, transform: function (sender, v) {
+                    return sender.bounds.top +
+                        sender.bounds.height -
+                        ((v - sender.document.view.h.min) *
+                            this.ratio * sender.bounds.height / 120);
+                } });
+            return document;
+        },
+        resetView: function () {
+            return document.configureView(0, document.length - 1);
+        }
+    };
+    return document.resetView();
+}
+exports.createDocument = createDocument;
+
+},{"../core":16,"../core.pub-sub":18,"../math":25,"./utils":5}],5:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.describeArc = exports.PathBuilder = exports.niceScale = exports.createColors = void 0;
+var math_1 = require("../math");
+exports.createColors = function (v) {
+    var __v = [0, 51, 102, 153, 204, 255];
+    var __l = __v.length - 1;
+    var __c = [];
+    var __x = 0;
+    while (__x < v) {
+        __c.add('rgba({0},{1},{2},.9)'.format(__v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)]));
+        __x++;
+    }
+    return {
+        current: -1,
+        values: __c,
+        next: function () {
+            this.current = ++this.current % this.values.length;
+            return this.values[this.current];
+        }
+    };
+};
+exports.niceScale = function (min, max, steps) {
+    var range = __niceNum(max - min, false);
+    var tickSpacing = __niceNum(range / (steps - 1), true);
+    var niceMin = Math.floor(min / tickSpacing) * tickSpacing;
+    var niceMax = Math.ceil(max / tickSpacing) * tickSpacing;
+    var result = { range: range,
+        min: niceMin,
+        max: niceMax,
+        tickSpacing: tickSpacing, values: Array() };
+    function __niceNum(range, round) {
+        var exponent = Math.floor(Math.log10(range));
+        var fraction = range / Math.pow(10, exponent);
+        var niceFraction;
+        if (round) {
+            if (fraction < 1.5)
+                return Math.pow(10, exponent);
+            else if (fraction < 3)
+                return 2 * Math.pow(10, exponent);
+            else if (fraction < 7)
+                return 5 * Math.pow(10, exponent);
+            else
+                return 10 * Math.pow(10, exponent);
+        }
+        if (fraction <= 1)
+            return Math.pow(10, exponent);
+        else if (fraction <= 2)
+            return 2 * Math.pow(10, exponent);
+        else if (fraction <= 5)
+            return 5 * Math.pow(10, exponent);
+        else
+            return 10 * Math.pow(10, exponent);
+    }
+    for (var x = result.max; x > result.min; x -= result.tickSpacing) {
+        result.values.push(x);
+    }
+    return result;
+};
+var PathBuilder = (function () {
+    function PathBuilder() {
+    }
+    PathBuilder.line = function (a, b) {
+        var lengthX = b.x - a.x;
+        var lengthY = b.y - a.y;
+        return {
+            length: Math.sqrt(Math.pow(lengthX, 2) + Math.pow(lengthY, 2)),
+            angle: Math.atan2(lengthY, lengthX)
+        };
+    };
+    PathBuilder.controlPoint = function (line, smooth) { return function (current, previous, next, reverse) {
+        var p = previous || current;
+        var n = next || current;
+        var l = line(p, n);
+        var angle = l.angle + (reverse ? Math.PI : 0);
+        var length = l.length * smooth;
+        var x = current.x + Math.cos(angle) * length;
+        var y = current.y + Math.sin(angle) * length;
+        return new math_1.Vector2(x, y);
+    }; };
+    PathBuilder.bezierCommand = function (controlPoint) { return function (point, i, a) {
+        var cps = controlPoint(a[i - 1], a[i - 2], point);
+        var cpe = controlPoint(point, a[i - 1], a[i + 1], true);
+        return 'C {0},{1} {2},{3} {x},{y}'.format(cps.x, cps.y, cpe.x, cpe.y, point);
+    }; };
+    PathBuilder.svgPath = function (points, command, closePath) {
+        return points.reduce(function (acc, e, i, a) {
+            if (i == 0)
+                return 'M {x},{y}'.format(e);
+            if (closePath && i == a.length - 2 ||
+                closePath && i == a.length - 1)
+                return acc += ' L {x},{y}'.format(e);
+            return acc += ' ' + command(e, i, a);
+        }, '') + (closePath ? ' z' : '');
+    };
+    PathBuilder.createPath = function (points, smoothing, closePath) {
+        if (closePath === void 0) { closePath = true; }
+        var bezierCommandCalc = PathBuilder.bezierCommand(PathBuilder.controlPoint(PathBuilder.line, smoothing));
+        return PathBuilder.svgPath(points, bezierCommandCalc, closePath);
+    };
+    return PathBuilder;
+}());
+exports.PathBuilder = PathBuilder;
+exports.describeArc = function (x, y, radius, startAngle, endAngle) {
+    var start = math_1.polarToCartesian(x, y, radius, endAngle - 90);
+    var end = math_1.polarToCartesian(x, y, radius, startAngle - 90);
+    var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
+    var d = [
+        "M", start.x, start.y,
+        "A", radius, radius, 0, arcSweep, 0, end.x, end.y,
+        "L", x, y,
+        "L", start.x, start.y
+    ].join(" ");
+    return d;
+};
+
+},{"../math":25}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CollapsibleBox = void 0;
@@ -118,7 +863,7 @@ var CollapsibleBox = (function () {
 }());
 exports.CollapsibleBox = CollapsibleBox;
 
-},{"./core":12,"./core.events":10}],3:[function(require,module,exports){
+},{"./core":16,"./core.events":14}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EditableGrid = void 0;
@@ -215,7 +960,7 @@ var EditableGrid = (function () {
 }());
 exports.EditableGrid = EditableGrid;
 
-},{"./core.pub-sub":14}],4:[function(require,module,exports){
+},{"./core.pub-sub":18}],8:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TextViewer = void 0;
@@ -275,9 +1020,9 @@ var TextViewer = (function () {
 }());
 exports.TextViewer = TextViewer;
 
-},{"./controls.text-viewer.ts.css":5,"./core":12,"./core.events":10}],5:[function(require,module,exports){
+},{"./controls.text-viewer.ts.css":9,"./core":16,"./core.events":14}],9:[function(require,module,exports){
 module.exports = '\r\n.svc_viewer{overflow:hidden;}\r\n.scv_Main  {position:absolute;top:0;left:0;right:0;bottom:0;overflow:auto;padding:0;}     \r\n.scv_TextContainer{ position:absolute;top:0;left:4.4em;right:0;height:auto;z-index:4;margin:0;user-select: text; }\r\n.scv_TextContainer{ padding:.4em;white-space:pre;overflow:initial;font-family:Monospace;tab-size:4;}\r\n.scv_LineContainer{ padding:.4em;position:absolute;top:0;left:0;height:auto;margin:0;z-index:5;overflow:hidden;background-color:lightyellow;border-right:solid 1px silver;}\r\n.scv_LineContainer{ font-weight:bold;font-family:Monospace;color:Gray;text-align:right;width:3.5em;box-sizing:border-box;user-select:none }\r\n';
-},{}],6:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ajax = void 0;
@@ -326,7 +1071,7 @@ var ajax = {
 };
 exports.ajax = ajax;
 
-},{}],7:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommandManager = void 0;
@@ -368,7 +1113,7 @@ function CommandManager(doc) {
 exports.CommandManager = CommandManager;
 ;
 
-},{}],8:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addEventListeners = void 0;
@@ -454,7 +1199,7 @@ function addEventListeners(container, handlers, context) {
 }
 exports.addEventListeners = addEventListeners;
 
-},{"./core":12,"./core.pub-sub":14,"tslib":21}],9:[function(require,module,exports){
+},{"./core":16,"./core.pub-sub":18,"tslib":26}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DialogHelper = void 0;
@@ -512,7 +1257,7 @@ var DialogHelper = (function () {
 }());
 exports.DialogHelper = DialogHelper;
 
-},{}],10:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CoreEvent = void 0;
@@ -539,7 +1284,7 @@ var CoreEvent = (function () {
 }());
 exports.CoreEvent = CoreEvent;
 
-},{}],11:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var includes = [];
@@ -570,7 +1315,7 @@ function include(url) {
 }
 exports.default = include;
 
-},{}],12:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.core = void 0;
@@ -928,7 +1673,7 @@ NodeList.prototype.toArray = function () {
 };
 Object.entries = Object.entries || (function (o) { return Object.keys(o).map(function (k) { return [k, o[k]]; }); });
 
-},{"tslib":21}],13:[function(require,module,exports){
+},{"tslib":26}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Paginator = void 0;
@@ -967,7 +1712,7 @@ var Paginator = (function () {
 }());
 exports.Paginator = Paginator;
 
-},{}],14:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var tslib_1 = require("tslib");
@@ -1030,7 +1775,7 @@ exports.default = {
     }
 };
 
-},{"tslib":21}],15:[function(require,module,exports){
+},{"tslib":26}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
@@ -1348,7 +2093,7 @@ var ReportEngine = (function () {
 }());
 exports.ReportEngine = ReportEngine;
 
-},{"./core":12,"./core.templates":19}],16:[function(require,module,exports){
+},{"./core":16,"./core.templates":23}],20:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loader = void 0;
@@ -1510,7 +2255,7 @@ function loadReport(code) {
 var loader = { load: loadReport };
 exports.loader = loader;
 
-},{}],17:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEngine = void 0;
@@ -1809,7 +2554,7 @@ function onMessage(message) {
     }
 }
 
-},{"./core":12}],18:[function(require,module,exports){
+},{"./core":16}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loader = void 0;
@@ -1938,7 +2683,7 @@ function loadReport(code) {
 var loader = { load: loadReport };
 exports.loader = loader;
 
-},{}],19:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fillTemplate = exports.executeTemplate = exports.merge = void 0;
@@ -2064,7 +2809,7 @@ function executeTemplate(e, values, dom) {
 }
 exports.executeTemplate = executeTemplate;
 
-},{"./core":12,"tslib":21}],20:[function(require,module,exports){
+},{"./core":16,"tslib":26}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TreeUtils = void 0;
@@ -2143,7 +2888,166 @@ var TreeUtils = (function () {
 }());
 exports.TreeUtils = TreeUtils;
 
-},{"./core":12,"./core.templates":19,"tslib":21}],21:[function(require,module,exports){
+},{"./core":16,"./core.templates":23,"tslib":26}],25:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NextPowerOfTwo = exports.IsPowerOfTwo = exports.polarToCartesian = exports.Degrees = exports.Radians = exports.Clamp = exports.Random = exports.Rectangle = exports.Box = exports.Vector2 = void 0;
+var Vector2 = (function () {
+    function Vector2(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+    Vector2.fromArrayi = function (values) { return new Vector2(~~values[0], ~~values[1]); };
+    ;
+    Vector2.sum = function (a, b) { return new Vector2(a.x + b.x, a.y + b.y); };
+    ;
+    Vector2.difference = function (a, b) { return new Vector2(a.x - b.x, a.y - b.y); };
+    ;
+    Vector2.dot = function (a, b) { return a.x * b.x + a.y * b.y; };
+    ;
+    Vector2.cross = function (a, b) { return a.x * b.y - a.y * b.x; };
+    ;
+    Vector2.distance = function (a, b) { var dx = a.x - b.x; var dy = a.y - b.y; return Math.sqrt(dx * dx + dy * dy); };
+    ;
+    Vector2.distanceSquared = function (a, b) { var dx = a.x - b.x; var dy = a.y - b.y; return dx * dx + dy * dy; };
+    ;
+    Vector2.equals = function (a, b) { return a.x == b.x && a.y == b.y; };
+    ;
+    Vector2.lerp = function (a, b, f, resultVec) {
+        var x = a.x, y = a.y;
+        resultVec.x = (b.x - x) * f + x;
+        resultVec.y = (b.y - y) * f + y;
+        return resultVec;
+    };
+    Vector2.prototype.set = function (x, y) { this.x = x; this.y = y; return this; };
+    ;
+    Vector2.prototype.clone = function () { return new Vector2(this.x, this.y); };
+    ;
+    Vector2.prototype.length = function () { return Math.sqrt(this.x * this.x + this.y * this.y); };
+    ;
+    Vector2.prototype.lengthSquared = function () { return this.x * this.x + this.y * this.y; };
+    ;
+    Vector2.prototype.invert = function () { this.x = -this.x; this.y = -this.y; return this; };
+    ;
+    Vector2.prototype.cross = function (vector) { return this.x * vector.y - this.y * vector.x; };
+    Vector2.prototype.dot = function (vector) { return this.x * vector.x + this.y * vector.y; };
+    ;
+    Vector2.prototype.scale = function (sx, sy) { this.x *= sx; this.y *= sy; return this; };
+    ;
+    Vector2.prototype.normalize = function () { var _d = 1 / this.length(); return this.scale(_d, _d); };
+    ;
+    Vector2.prototype.normalisedCopy = function () { return new Vector2(this.x, this.y).normalize(); };
+    ;
+    Vector2.prototype.add = function (vector) { this.x += vector.x; this.y += vector.y; return this; };
+    ;
+    Vector2.prototype.subtract = function (vector) { this.x -= vector.x; this.y -= vector.y; return this; };
+    ;
+    Vector2.prototype.mul = function (scalar) { this.x *= scalar; this.y *= scalar; return this; };
+    ;
+    Vector2.prototype.divide = function (scalar) { this.x /= scalar; this.y /= scalar; return this; };
+    ;
+    Vector2.prototype.equals = function (vector) { return this == vector || !!vector && this.x == vector.x && this.y == vector.y; };
+    ;
+    Vector2.prototype.rotate = function (angle) {
+        var cos = Math.cos(angle);
+        var sin = Math.sin(angle);
+        var newX = this.x * cos - this.y * sin;
+        var newY = this.y * cos + this.x * sin;
+        this.x = newX;
+        this.y = newY;
+        return this;
+    };
+    ;
+    Vector2.Vector2_ZERO = new Vector2(0.0, 0.0);
+    Vector2.Vector2_UNIT_X = new Vector2(1.0, 0.0);
+    Vector2.Vector2_UNIT_Y = new Vector2(0.0, 1.0);
+    Vector2.Vector2_NEGATIVE_UNIT_X = new Vector2(-1.0, 0.0);
+    Vector2.Vector2_NEGATIVE_UNIT_Y = new Vector2(0.0, -1.0);
+    Vector2.Vector2_UNIT_SCALE = new Vector2(1.0, 1.0);
+    Vector2.rotateAroundPoint = function (v, axisPoint, angle) {
+        return v.clone()
+            .subtract(axisPoint)
+            .rotate(angle)
+            .add(axisPoint);
+    };
+    return Vector2;
+}());
+exports.Vector2 = Vector2;
+var Box = (function () {
+    function Box(top, right, bottom, left) {
+        this.left = left;
+        this.top = top;
+        this.right = right;
+        this.bottom = bottom;
+    }
+    Box.prototype.clone = function () { return new Box(this.top, this.right, this.bottom, this.left); };
+    ;
+    Box.prototype.toRect = function () { return new Rectangle(this.left, this.top, this.right - this.left, this.bottom - this.top); };
+    ;
+    Box.prototype.centerPoint = function () { return new Vector2(this.left + ((this.right - this.left) >> 1), this.top + ((this.bottom - this.top) >> 1)); };
+    ;
+    return Box;
+}());
+exports.Box = Box;
+var Rectangle = (function () {
+    function Rectangle(left, top, width, height) {
+        this.left = left;
+        this.top = top;
+        this.width = width;
+        this.height = height;
+    }
+    Rectangle.prototype.clone = function () { return new Rectangle(this.left, this.top, this.width, this.height); };
+    ;
+    Rectangle.prototype.toBox = function () { return new Box(this.top, this.left + this.width, this.top + this.height, this.left); };
+    ;
+    Rectangle.prototype.centerPoint = function () { return new Vector2(this.left + (this.width >> 1), this.top + (this.height >> 1)); };
+    ;
+    Rectangle.prototype.contains = function (other) {
+        if (other instanceof Rectangle) {
+            return this.left <= other.left &&
+                this.left + this.width >= other.left + other.width &&
+                this.top <= other.top &&
+                this.top + this.height >= other.top + other.height;
+        }
+        else {
+            return other.x >= this.left &&
+                other.x <= this.left + this.width &&
+                other.y >= this.top &&
+                other.y <= this.top + this.height;
+        }
+    };
+    ;
+    return Rectangle;
+}());
+exports.Rectangle = Rectangle;
+function Random(max, min) { return Math.random() * (max - min + 1) + min; }
+exports.Random = Random;
+function Clamp(value, min, max) { return Math.min(Math.max(value, min), max); }
+exports.Clamp = Clamp;
+;
+function Radians(degrees) { return degrees * Math.PI / 180; }
+exports.Radians = Radians;
+;
+function Degrees(radians) { return radians * 180 / Math.PI; }
+exports.Degrees = Degrees;
+;
+function IsPowerOfTwo(value) { return value > 0 && (value & (value - 1)) == 0; }
+exports.IsPowerOfTwo = IsPowerOfTwo;
+;
+function NextPowerOfTwo(value) { var k = 1; while (k < value)
+    k *= 2; return k; }
+exports.NextPowerOfTwo = NextPowerOfTwo;
+;
+function polarToCartesian(x, y, r, angleInDegrees) {
+    var __angleInRadians = Radians(angleInDegrees);
+    return {
+        x: x + (r * Math.cos(__angleInRadians)),
+        y: y + (r * Math.sin(__angleInRadians))
+    };
+}
+exports.polarToCartesian = polarToCartesian;
+
+},{}],26:[function(require,module,exports){
 (function (global){(function (){
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.

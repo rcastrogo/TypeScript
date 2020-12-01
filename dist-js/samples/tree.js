@@ -25,8 +25,8 @@ var TreeAction = (function () {
             'publisher']);
         var leaf_template = core_1.core.build('div', { className: 'w3-margin-bottom node-leaf',
             innerHTML: '<h4 xbind data-level="{deep}">{name}</h4>' +
-                '<ul xfor="book in rows">' +
-                '  <li xbind>{book.ID} {book.title}</li>' +
+                '<ul>' +
+                '  <li xfor="book in rows" xbind>{book.ID} {book.title}</li>' +
                 '</ul>' +
                 '<h5 class="w3-right-align" xbind>{name} {rows.length} libros</h5>'
         });

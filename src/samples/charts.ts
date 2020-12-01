@@ -7,6 +7,10 @@ import { fillTemplate, executeTemplate } from '../lib/core.templates';
 import { TreeUtils } from '../lib/core.tree';
 import * as g from '@src/math';
 import { BarChart } from '@src/charts/charts';
+import { createColors, describeArc } from '../lib/charts/utils';
+import LineChart, { createDocument } from '../lib/charts/lines';
+
+const COLORS = createColors(30);
 
 export class SvgBarChartAction {
  
@@ -20,47 +24,108 @@ export class SvgBarChartAction {
   // Render
   // ============================================================
   run() {
-    let __max = 100;
 
-    let __data = [
-      [~~g.Random(__max, 0), "Ovino", "Toledo", ''],
-      [~~g.Random(__max, 0), "Caprino", "Toledo", ''],
-      [~~g.Random(__max, 0), "Bovino", "Toledo"],
-      [~~g.Random(__max, 0), "Otros", "Toledo"],
-      [~~g.Random(__max, 0), "Ovino", "Madrid"],
-      [~~g.Random(__max, 0), "Caprino", "Madrid"],
-      [~~g.Random(__max, 0), "Bovino", "Madrid"],
-      [~~g.Random(__max, 0), "Ovino", "Sevilla"],
-      [~~g.Random(__max, 0), "Caprino", "Sevilla"],
-      [~~g.Random(__max, 0), "Bovino", "Sevilla"],
-      [~~g.Random(__max, 0), "Ovino", "Ávila"],
-      [~~g.Random(__max, 0), "Caprino", "Ávila"],
-      [~~g.Random(__max, 0), "Bovino", "Ávila"]
+    let __max = 60;
+
+    let __data1 = [
+      [~~g.Random(__max, 10), "Ovino", "Toledo", ''],
+      [~~g.Random(__max, 10), "Caprino", "Toledo", ''],
+      [~~g.Random(__max, 10), "Bovino", "Toledo"],
+      [~~g.Random(__max, 10), "Otros", "Toledo"],
+      [~~g.Random(__max, 10), "Ovino", "Madrid"],
+      [~~g.Random(__max, 10), "Caprino", "Madrid"],
+      [~~g.Random(__max, 10), "Bovino", "Madrid"],
+      [~~g.Random(__max, 10), "Ovino", "Sevilla"],
+      [~~g.Random(__max, 10), "Caprino", "Sevilla"],
+      [~~g.Random(__max, 10), "Bovino", "Sevilla"],
+      [~~g.Random(__max, 10), "Ovino", "Ávila"],
+      [~~g.Random(__max, 10), "Caprino", "Ávila"],
+      [~~g.Random(__max, 10), "Bovino", "Ávila"]
     ];
 
-    //let __data = [[~~g.Random(__max, 0), "lunes 4", "", "red"],
-    //              [~~g.Random(__max, 0), "martes 5", ""],
-    //              [~~g.Random(__max, 0), "miércoles 6", ""], 
-    //              [~~g.Random(__max, 0), "jueves 7", ""], 
-    //              [~~g.Random(__max, 0), "viernes 8", ""], 
-    //              [~~g.Random(__max, 0), "lunes 11", ""], 
-    //              [~~g.Random(__max, 0), "martes 12", ""], 
-    //              [~~g.Random(__max, 0), "miércoles 13", ""], 
-    //              [~~g.Random(__max, 0), "lunes 18", ""], 
-    //              [~~g.Random(__max, 0), "lunes 25", ""]];
+    let __data2 = 
+      [[~~g.Random(__max, 40), "lunes 4", "", "red"],
+      [~~g.Random(__max, 4), "martes 5", ""],
+      [~~g.Random(__max, 4), "miércoles 6", ""], 
+      [~~g.Random(__max, 4), "jueves 7", ""], 
+      [~~g.Random(__max, 4), "viernes 8", ""], 
+      [~~g.Random(__max, 4), "lunes 11", ""], 
+      [~~g.Random(__max, 4), "martes 12", ""], 
+      [~~g.Random(__max, 4), "miércoles 13", ""], 
+      [~~g.Random(__max, 4), "lunes 18", ""], 
+      [~~g.Random(__max, 4), "lunes 25", ""]];
+
+    let __data3 = [
+      [~~g.Random(__max, 4), '00:00'],
+      [~~g.Random(__max, 4), '01:00'],
+      [~~g.Random(__max, 4), '02:00'],
+      [~~g.Random(__max, 4), '03:00'],
+      [~~g.Random(__max, 4), '04:00'],
+      [~~g.Random(__max, 4), '05:00'],
+      [~~g.Random(__max, 4), '06:00'],
+      [~~g.Random(__max, 4), '07:00'],
+      [~~g.Random(__max, 4), '08:00'],
+      [~~g.Random(__max, 4), '09:00'],
+      [~~g.Random(__max, 4), '10:00'],
+      [~~g.Random(__max, 4), '11:00'],
+      [~~g.Random(__max, 4), '12:00']
+    ];
 
     pubSub.publish(
       'msg/main-page/test/content',
-      new BarChart(1200, 
-                   300, 
-                   __data, 
-                   new g.Box(20, 20, 40, 40),  
-                   true, 
-                   true, 
-                   true, 
-                   true)
-        .getControl()
-        .outerHTML
+          '<p>Control de gráficos de barras (svg)</p>' +
+          new BarChart(650, 230, __data1, {
+                       padding    : new g.Box(20, 20, 40, 40),
+                       showBars   : true,
+                       showDots   : false,
+                       showLine   : false,
+                       showValues : true
+                      })
+                      .getControl()
+                      .outerHTML 
+          + 
+          new BarChart(650, 230, __data1, {
+                       padding    : new g.Box(20, 20, 40, 40),
+                       showBars   : false,
+                       showDots   : true,
+                       showLine   : true,
+                       showValues : true,
+                       closeLines : true
+                      })
+                      .getControl()
+                      .outerHTML 
+          + 
+          new BarChart(650, 230, __data2, {
+                       padding    : new g.Box(20, 20, 40, 40),
+                       showBars   : false,
+                       showDots   : true,
+                       showLine   : true,
+                       showValues : true
+                      })
+                      .getControl()
+                      .outerHTML
+          + 
+          new BarChart(650, 230, __data3, {
+                       padding    : new g.Box(20, 20, 40, 40),
+                       showBars   : false,
+                       showDots   : true,
+                       showLine   : true,
+                       showValues : true,
+                       closeLines : false
+                      })
+                      .getControl()
+                      .outerHTML
+          + 
+          new BarChart(650, 230, __data3, {
+                       padding    : new g.Box(20, 20, 40, 40),
+                       showBars   : false,
+                       showDots   : false,
+                       showLine   : true,
+                       showValues : false,
+                       closeLines : false
+                      })
+                      .getControl()
+                      .outerHTML
     );
 
     setTimeout(() => {
@@ -72,7 +137,6 @@ export class SvgBarChartAction {
 
   }
 }
-
 
 export class BarChartAction {
  
@@ -140,7 +204,7 @@ export class BarChartAction {
        
     pubSub.publish(
       'msg/main-page/test/content',
-      '<p>Generación de gráficos de barras</p>' +
+      '<p>Generación de gráficos de barras (svg + executeTemplate)</p>' +
       executeTemplate(__template, [__context])
     );
   }
@@ -169,69 +233,140 @@ export class PieChartAction {
   private createPieChart() {
 
      var __template = core.build('div', 
-                                { className : 'w3-margin-bottom w3-border',
-                                  innerHTML : '<svg width="500"' + 
-                                              '     height="500">' +
-                                              '  <g transform="translate(250,250)">' +
-                                              '    <circle cx="0" cy="0" r="149" stroke="black" stroke-width="0" fill="silver" />' +
-                                              '    <path xfor="value in values"' +
-                                              '          xbind="id:fn.calc=>@value" ' +
-                                              '    </path >' + 
+                                { className : 'w3-margin-bottom w3-border w3-center',
+                                  innerHTML : '<svg viewbox ="-200 -200 400 400">' +
+                                              '  <circle cx="0" cy="0" r="149" stroke="black" stroke-width="1" fill="antiquewhite" />' +
+                                              '  <g xfor="value in values">' +
+                                              '    <path stroke-width="1" ' + 
+                                              '          stroke="gray" ' + 
+                                              '          fill="silver" ' +
+                                              '          xbind="id:fn.calc=>@value" >' +
+                                              '    </path>' + 
+                                              '    <text text-anchor="middle" font-size="12px" ' + 
+                                              '          stroke-width="0" ' + 
+                                              '          stroke="white" ' + 
+                                              '          fill="black" ' + 
+                                              '          xbind="id:fn.calcLine=>@value">{value.text}</text>' + 
                                               '  </g>' +
-                                              '</svg>'
+                                              '</svg>',
+                                  style : { width : '50%' }
                                 });
-    var __colors = ['red', 'yellow', 'green', 'blue', 'orange', 'purple', 'black', 'gray'];
-    var __that = this;
-    var __toAngle   = (value:number) => value * 3.6;
-    var __toRadians = (degrees:number) => degrees * Math.PI / 180;
-    var __context = { 
-      values : [ 40, 20, 15],
-      offset : 0,
-      fn     : {
-        calc: function (value:number, target:SVGPathElement) {
-          let __bindContext = this as any;
 
-          target.setAttribute('stroke-width', '2');
-          target.setAttribute('stroke', 'white');
-          target.setAttribute('fill', __colors[__bindContext.index % 8]);
-          target.setAttribute('d', __that.describeArc(0, 0, 150, __toAngle(__context.offset), __toAngle(value + __context.offset)));
-          __context.offset += value;
-          return 'sector-{0}'.format(__bindContext.index);
+    function __computeValues(values: number[]):any[] {
+      let __total  = values.reduce((acc, v) => acc += v );
+      let __offset = 0;
+      return values.sort((a, b) => b - a).map((v, i, self) => {
+        let __percent = v * 100 /__total;
+        let __value   = {
+          index      : i,
+          value      : v,
+          percent    : __percent,
+          text       : '{0}%'.format(__percent.toFixed(1)),
+          offset     : __offset,
+          arc_start  : __offset * 3.6,
+          arc_center : (__offset + __percent / 2) * 3.6,
+          arc_end    : (__offset + __percent) * 3.6,
+          angle      : g.Radians(-90 + ((__offset + __percent / 2) * 3.6)),
+          direction  : new g.Vector2(0, 0)
+        }
+        __value.direction = new g.Vector2(Math.cos(__value.angle), Math.sin(__value.angle))
+        __offset += __percent;
+        return __value;
+      });
+    }
+
+    var __values = [
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50)),
+      ~~g.Random(345, ~~g.Random(100,50))
+    ].slice(0, ~~g.Random(9, 2));
+
+    var __context = { 
+      values  : __computeValues(__values),
+      fn      : {
+        calc: function (value:any, target:SVGPathElement) {
+
+          var __trans = value.direction.clone().mul(4);
+          target.setAttribute('d', describeArc(0, 0, 150, value.arc_start, value.arc_end));
+          target.setAttribute('transform', 'translate({x},{y})'.format(__trans));
+          target.setAttribute('fill', COLORS.next());
+          return 'sector-{0}'.format(value.index);
+
+        },
+        calcLine: function (value:any, target:SVGTextElement) {
+          
+          var __textPoint =  value.direction.clone().mul(150 * 1.07);
+          target.setAttribute('x', __textPoint.x.toString());
+          target.setAttribute('y', __textPoint.y.toString());
+          target.setAttribute('transform', 'rotate({0},{x},{y})'.format(value.arc_center, __textPoint));
+
+          return 'text-{0}'.format(value.index);
+
         }
       }
     };
 
     pubSub.publish(
       'msg/main-page/test/content',
-      '<p>Generación de gráficos de barras</p>' +
+      '<p>Generación de gráficos de tarta (svg + executeTemplate)</p>' +
       executeTemplate(__template, [__context])
     );
 
   }
 
-  private polarToCartesian(x:number, y:number, r:number, angleInDegrees:number) {
-    var __angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
-    return {
-      x: x + (r * Math.cos(__angleInRadians)),
-      y: y + (r * Math.sin(__angleInRadians))
-    };
+}
+
+export class LineChartAction {
+ 
+  // ============================================================
+  // Constructor
+  // ============================================================
+  constructor() {
   }
 
-  private describeArc(x:number, y:number, radius:number, startAngle:number, endAngle:number){
+  // ============================================================
+  // Render
+  // ============================================================
+  run() {
+ let __max = 60;
 
-    var start = this.polarToCartesian(x, y, radius, endAngle);
-    var end = this.polarToCartesian(x, y, radius, startAngle);
+    //  [~~g.Random(__max, 10), "", ""]
+    let __document = createDocument({ 
+      streams : {
+        distance : { data : [0, 100, 200, 300, 500, 800, 900, 950]},
+        altitude : { data : [150, 50, 26, 155, 60, 45, 40, 0]},
+        s2       : { data : [150, 50, 200, 185, 160, 145, 120, 0]}
+      }
+    });   
 
-    var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
+    pubSub.publish(
+      'msg/main-page/test/content',
+      '<p>Control de gráficos de lineas (svg)</p>' +
+      '<div class="jjj-5"></div>'
+    );
 
-    var d = [
-        "M", start.x, start.y, 
-        "A", radius, radius, 0, arcSweep, 0, end.x, end.y,
-        "L", x, y,
-        "L", start.x, start.y
-    ].join(" ");
+    setTimeout(() => {
+      let __svg = new LineChart(750, 
+                                300, 
+                                __document, {
+                                  padding    : new g.Box(20, 40, 40, 40)
+                                }).getControl();
+      core.element('.jjj-5').appendChild(__svg);
+      pubSub.subscribe('msg/line_chart/range', (name: string, value: any) => {
+        console.log(value);
+      });
 
-    return d;       
+      pubSub.subscribe('msg/line_chart/tap', (name: string, value: any) => {
+        console.log(value);
+      });
+
+    }, 100);
   }
 
 }
