@@ -339,9 +339,9 @@ export class LineChartAction {
     //  [~~g.Random(__max, 10), "", ""]
     let __document = createDocument({ 
       streams : {
-        distance : { data : [0, 100, 200, 300, 500, 800, 900, 950]},
-        altitude : { data : [150, 50, 26, 155, 60, 45, 40, 0]},
-        s2       : { data : [150, 50, 200, 185, 160, 145, 120, 0]}
+        distance : { data : [0, 100, 200, 300, 500, 800, 900, 950, 1000]},
+        altitude : { data : [150, 50, 26, 155, 60, 45, 40, 80, 0]},
+        s2       : { data : [150, 50, 200, 185, 160, 145, 120, 80, 0]}
       }
     });   
 
@@ -352,18 +352,18 @@ export class LineChartAction {
     );
 
     setTimeout(() => {
-      let __svg = new LineChart(750, 
+      let __svg = new LineChart(650, 
                                 300, 
                                 __document, {
                                   padding    : new g.Box(20, 40, 40, 40)
                                 }).getControl();
       core.element('.jjj-5').appendChild(__svg);
       pubSub.subscribe('msg/line_chart/range', (name: string, value: any) => {
-        console.log(value);
+        //console.log(value);
       });
 
       pubSub.subscribe('msg/line_chart/tap', (name: string, value: any) => {
-        console.log(value);
+        //console.log(value);
       });
 
     }, 100);

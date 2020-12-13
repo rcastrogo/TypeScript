@@ -21,12 +21,16 @@ export default class LineChart {
   private padding:Box;
 
   private svg:SVGElement;
+  private layer:SVGRectElement;
   private ratio:Vector2;
 
   public getControl     = () => this.svg;
   public worldToScreenX = (x:number) => this.bounds.left + (x * this.ratio.x * this.bounds.width / 100);
   public worldToScreenY = (y:number) => this.bounds.top + this.bounds.height - ((y - this.document.view.y.min)  * this.ratio.y * this.bounds.height / 100);
-  public screenToWorldX = (x:number) => this.document.view.x.min + (x - this.bounds.left) * 100 / (this.bounds.width *  this.ratio.x ) ;
+  public screenToWorldX = (x:number) => {
+    var __x = x * (this.width / this.svg.clientWidth);
+    return this.document.view.x.min + (__x - this.bounds.left) * 100 / (this.bounds.width *  this.ratio.x );
+  }
   public indexPoinAt    = (distance:number) => {
                             var __i = -1;
                             this.document.distances.forEach( function(d:number){ if(d > distance) return; __i++; });
@@ -67,6 +71,10 @@ export default class LineChart {
                   '  </defs>' +
                   '  <g class="lines"></g>' +
                   '  <g class="data" style="clip-path:url(#JJJ)"></g>' +
+                  '  <g class="layer" style="clip-path:url(#JJJ)">' + 
+                  '    <rect x="0" y="0" width="0" height="{0}" stroke="none"' + 
+                  '       fill="rgb(0,0,200,.5)" />' +
+                  '  </g>' +
                   '  <g class="text"></g>' +
                   '</svg>').format(this.bounds.height + this.bounds.top - 1, this)
     this.svg = (core.build('div', __html, true) as unknown) as SVGElement;
@@ -77,6 +85,7 @@ export default class LineChart {
     this.svg.ontouchstart = this.onTouchStart;
     this.svg.ontouchend   = this.onTouchEnd;
     this.svg.ontouchmove  = this.onTouchMove;
+    this.layer = core.element<SVGRectElement>('g.layer rect', this.svg as any);
     // ==========================================================================
     // Inicializar los datos
     // ==========================================================================
@@ -246,7 +255,7 @@ export default class LineChart {
     if(this.mouse.mouseDown){
       this.mouse.mouseDown = false;
       this.mouse.drag = false;
-      //__chart.Draw();     
+      this.clearLayer();     
     }
   }
 
@@ -254,7 +263,7 @@ export default class LineChart {
     var __reset = () => {
       this.mouse.mouseDown = false;
       this.mouse.drag = false; 
-      //this.Draw();
+      this.clearLayer(); 
       eventArg.preventDefault();
     }
 
@@ -263,14 +272,15 @@ export default class LineChart {
         sender : this,
         start  : this.mouse.dragStart < 0 ? 0 : this.mouse.dragStart,
         end    : this.mouse.dragEnd
-      });            
-    }
-    else {     
-      pubsub.publish('msg/line_chart/tap', {
-        sender : this,
-        x : this.screenToWorldX(this.mouse.mouseDownPosition.x)
       });
-    }
+      __reset();
+      this.updateLayer();
+      return;
+    }   
+    pubsub.publish('msg/line_chart/tap', {
+      sender : this,
+      x : this.screenToWorldX(this.mouse.mouseDownPosition.x)
+    });
     __reset();
   }
 
@@ -279,7 +289,7 @@ export default class LineChart {
     var __reset = () => {
       this.mouse.mouseDown = false;
       this.mouse.drag = false; 
-      //this.Draw();
+      this.clearLayer();
       eventArg.preventDefault();
     }
     // ====================================================================
@@ -289,6 +299,7 @@ export default class LineChart {
                             && this.mouse.mouseDownPosition.y == __pos.y){ 
       pubsub.publish('msg/line_chart/tap', {
         sender : this,
+        position : __pos,
         x : this.screenToWorldX(__pos.x)
       });
       return __reset();
@@ -301,7 +312,10 @@ export default class LineChart {
         sender : this,
         start  : this.mouse.dragStart < 0 ? 0 : this.mouse.dragStart,
         end    : this.mouse.dragEnd
-      });            
+      });
+      __reset();
+      this.updateLayer();
+      return;
     }
     __reset();
   }
@@ -342,9 +356,26 @@ export default class LineChart {
     if(this.mouse.drag){
       this.mouse.dragEnd = this.indexPoinAt(this.screenToWorldX(__pos.x));
       if (this.mouse.dragEnd == -1) this.mouse.dragEnd = 0;
-      //this.Draw();
+      this.updateLayerDrag(__pos);
     } 
     eventArg.preventDefault();
+  }
+
+  private updateLayerDrag(pos:any) {
+    let x0 = (this.width / this.svg.clientWidth) * Math.min(pos.x, this.mouse.mouseDownPosition.x);
+    let x1 = (this.width / this.svg.clientWidth) * Math.max(pos.x, this.mouse.mouseDownPosition.x);
+    this.layer.setAttribute('x', x0.toString());
+    this.layer.setAttribute('width', (x1 - x0).toString());
+  }
+
+  private updateLayer() {
+    let x0 = this.worldToScreenX(this.document.distances[Math.min(this.mouse.dragStart, this.mouse.dragEnd)]);
+    let x1 = this.worldToScreenX(this.document.distances[Math.max(this.mouse.dragStart, this.mouse.dragEnd)]);
+    this.layer.setAttribute('x', x0.toString());
+    this.layer.setAttribute('width', (x1 - x0).toString());
+  }
+  private clearLayer() {
+    this.layer.setAttribute('width', "0");
   }
 
   private states:Array<any> = [];
@@ -405,12 +436,14 @@ export function createDocument(dataset:any){
         document.view.x       = {}; 
         document.view.x.max   = document.distances[end] * 1.005;
         document.view.x.min   = document.distances[start];
-        document.view.x.range = document.view.x.max - document.view.x.min;
-        document.view.y       = __getRange(document.altitude, start, end);
-        document.view.h       = __getRange(document.s2, start, end);
+        document.view.x.range = document.view.x.max - document.view.x.min; // Distancia
+        document.view.y       = __getRange(document.altitude, start, end); // Altitud
+        document.view.h       = __getRange(document.s2, start, end);       // Frecuencia cardiaca
+        //document.view.spedd = __getRange(document.s3, start, end);       // Velocidad por ejemplo
         // ===============================================================================================
         // Configurar distintas series de datos
         // ===============================================================================================
+        // TODO: Posibilitar mostrar un numero indeterminado de series. 
         document.series = [];
         document.series.push({ name        : 'altitude',
                                closeLine   : true,

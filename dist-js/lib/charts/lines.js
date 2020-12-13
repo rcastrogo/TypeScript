@@ -13,7 +13,10 @@ var LineChart = (function () {
         this.getControl = function () { return _this.svg; };
         this.worldToScreenX = function (x) { return _this.bounds.left + (x * _this.ratio.x * _this.bounds.width / 100); };
         this.worldToScreenY = function (y) { return _this.bounds.top + _this.bounds.height - ((y - _this.document.view.y.min) * _this.ratio.y * _this.bounds.height / 100); };
-        this.screenToWorldX = function (x) { return _this.document.view.x.min + (x - _this.bounds.left) * 100 / (_this.bounds.width * _this.ratio.x); };
+        this.screenToWorldX = function (x) {
+            var __x = x * (_this.width / _this.svg.clientWidth);
+            return _this.document.view.x.min + (__x - _this.bounds.left) * 100 / (_this.bounds.width * _this.ratio.x);
+        };
         this.indexPoinAt = function (distance) {
             var __i = -1;
             _this.document.distances.forEach(function (d) { if (d > distance)
@@ -24,12 +27,14 @@ var LineChart = (function () {
             if (_this.mouse.mouseDown) {
                 _this.mouse.mouseDown = false;
                 _this.mouse.drag = false;
+                _this.clearLayer();
             }
         };
         this.onTouchEnd = function (eventArg) {
             var __reset = function () {
                 _this.mouse.mouseDown = false;
                 _this.mouse.drag = false;
+                _this.clearLayer();
                 eventArg.preventDefault();
             };
             if (_this.mouse.drag) {
@@ -38,13 +43,14 @@ var LineChart = (function () {
                     start: _this.mouse.dragStart < 0 ? 0 : _this.mouse.dragStart,
                     end: _this.mouse.dragEnd
                 });
+                __reset();
+                _this.updateLayer();
+                return;
             }
-            else {
-                core_pub_sub_1.default.publish('msg/line_chart/tap', {
-                    sender: _this,
-                    x: _this.screenToWorldX(_this.mouse.mouseDownPosition.x)
-                });
-            }
+            core_pub_sub_1.default.publish('msg/line_chart/tap', {
+                sender: _this,
+                x: _this.screenToWorldX(_this.mouse.mouseDownPosition.x)
+            });
             __reset();
         };
         this.onMouseUp = function (eventArg) {
@@ -52,12 +58,14 @@ var LineChart = (function () {
             var __reset = function () {
                 _this.mouse.mouseDown = false;
                 _this.mouse.drag = false;
+                _this.clearLayer();
                 eventArg.preventDefault();
             };
             if (_this.mouse.mouseDown && _this.mouse.mouseDownPosition.x == __pos.x
                 && _this.mouse.mouseDownPosition.y == __pos.y) {
                 core_pub_sub_1.default.publish('msg/line_chart/tap', {
                     sender: _this,
+                    position: __pos,
                     x: _this.screenToWorldX(__pos.x)
                 });
                 return __reset();
@@ -68,6 +76,9 @@ var LineChart = (function () {
                     start: _this.mouse.dragStart < 0 ? 0 : _this.mouse.dragStart,
                     end: _this.mouse.dragEnd
                 });
+                __reset();
+                _this.updateLayer();
+                return;
             }
             __reset();
         };
@@ -100,6 +111,7 @@ var LineChart = (function () {
                 _this.mouse.dragEnd = _this.indexPoinAt(_this.screenToWorldX(__pos.x));
                 if (_this.mouse.dragEnd == -1)
                     _this.mouse.dragEnd = 0;
+                _this.updateLayerDrag(__pos);
             }
             eventArg.preventDefault();
         };
@@ -123,6 +135,10 @@ var LineChart = (function () {
             '  </defs>' +
             '  <g class="lines"></g>' +
             '  <g class="data" style="clip-path:url(#JJJ)"></g>' +
+            '  <g class="layer" style="clip-path:url(#JJJ)">' +
+            '    <rect x="0" y="0" width="0" height="{0}" stroke="none"' +
+            '       fill="rgb(0,0,200,.5)" />' +
+            '  </g>' +
             '  <g class="text"></g>' +
             '</svg>').format(this.bounds.height + this.bounds.top - 1, this);
         this.svg = core_1.core.build('div', __html, true);
@@ -133,6 +149,7 @@ var LineChart = (function () {
         this.svg.ontouchstart = this.onTouchStart;
         this.svg.ontouchend = this.onTouchEnd;
         this.svg.ontouchmove = this.onTouchMove;
+        this.layer = core_1.core.element('g.layer rect', this.svg);
         this.document = document;
         this.ratio = new math_1.Vector2(100.0 / this.document.view.x.range, 100.0 / this.document.view.y.range);
         this.draw();
@@ -250,6 +267,21 @@ var LineChart = (function () {
         this.svg
             .querySelector('g.data')
             .insertAdjacentHTML("beforeend", __html);
+    };
+    LineChart.prototype.updateLayerDrag = function (pos) {
+        var x0 = (this.width / this.svg.clientWidth) * Math.min(pos.x, this.mouse.mouseDownPosition.x);
+        var x1 = (this.width / this.svg.clientWidth) * Math.max(pos.x, this.mouse.mouseDownPosition.x);
+        this.layer.setAttribute('x', x0.toString());
+        this.layer.setAttribute('width', (x1 - x0).toString());
+    };
+    LineChart.prototype.updateLayer = function () {
+        var x0 = this.worldToScreenX(this.document.distances[Math.min(this.mouse.dragStart, this.mouse.dragEnd)]);
+        var x1 = this.worldToScreenX(this.document.distances[Math.max(this.mouse.dragStart, this.mouse.dragEnd)]);
+        this.layer.setAttribute('x', x0.toString());
+        this.layer.setAttribute('width', (x1 - x0).toString());
+    };
+    LineChart.prototype.clearLayer = function () {
+        this.layer.setAttribute('width', "0");
     };
     LineChart.prototype.saveContext = function () {
         this.states.push(core_1.core.clone(this.currentFont));
