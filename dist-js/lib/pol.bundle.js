@@ -32,7 +32,7 @@ var utils_1 = require("./utils");
 var math_1 = require("../math");
 var core_1 = require("../core");
 var STEPS_SCALE_Y = 25;
-var COLORS = utils_1.createColors(30);
+var COLORS = (0, utils_1.createColors)(30);
 var BarChart = (function () {
     function BarChart(width, height, data, o) {
         var _this = this;
@@ -159,7 +159,7 @@ var BarChart = (function () {
             '      stroke-width="1"/>';
         this.saveContext();
         this.currentFont.textAnchor = 'end';
-        utils_1.niceScale(0, this.maxValue, STEPS_SCALE_Y)
+        (0, utils_1.niceScale)(0, this.maxValue, STEPS_SCALE_Y)
             .values
             .forEach(function (value) {
             var __height = _this.worldToScreenY(value);
@@ -319,7 +319,7 @@ var math_1 = require("../math");
 var core_1 = require("../core");
 var core_pub_sub_1 = require("../core.pub-sub");
 var STEPS_SCALE_Y = 8;
-var COLORS = utils_1.createColors(30);
+var COLORS = (0, utils_1.createColors)(30);
 var LineChart = (function () {
     function LineChart(width, height, document, o) {
         var _this = this;
@@ -491,7 +491,7 @@ var LineChart = (function () {
         this.currentFont.fontSize = '9px';
         this.currentFont.textAnchor = 'end';
         var __serie = this.document.series[0];
-        var __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+        var __scale = (0, utils_1.niceScale)(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
         __scale.values
             .forEach(function (value) {
             var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
@@ -504,7 +504,7 @@ var LineChart = (function () {
         if (this.document.series[1]) {
             this.currentFont.textAnchor = 'start';
             __serie = this.document.series[1];
-            __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+            __scale = (0, utils_1.niceScale)(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
             __scale.values
                 .forEach(function (value) {
                 var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
@@ -527,7 +527,7 @@ var LineChart = (function () {
         var __v_tmp = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}" stroke="gray" stroke-width="1" />';
         var __offsetX = this.worldToScreenX(this.document.view.x.min) - this.bounds.left;
         var __html = '';
-        var __scale = utils_1.niceScale(this.document.view.x.min, this.document.view.x.max, Math.floor(this.bounds.width / 50));
+        var __scale = (0, utils_1.niceScale)(this.document.view.x.min, this.document.view.x.max, Math.floor(this.bounds.width / 50));
         this.currentFont.fontSize = '9px';
         __scale.values
             .forEach(function (value) {
@@ -668,7 +668,8 @@ function createDocument(dataset) {
                 fillStyle: 'rgba(150,0,0,.8)',
                 lineWidth: 3,
                 strokeStyle: 'rgba(00,0,250,.9)',
-                ratio: 100.0 / document.view.h.range, transform: function (sender, v) {
+                ratio: 100.0 / document.view.h.range,
+                transform: function (sender, v) {
                     return sender.bounds.top +
                         sender.bounds.height -
                         ((v - sender.document.view.h.min) *
@@ -689,13 +690,13 @@ exports.createDocument = createDocument;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.describeArc = exports.PathBuilder = exports.niceScale = exports.createColors = void 0;
 var math_1 = require("../math");
-exports.createColors = function (v) {
+var createColors = function (v) {
     var __v = [0, 51, 102, 153, 204, 255];
     var __l = __v.length - 1;
     var __c = [];
     var __x = 0;
     while (__x < v) {
-        __c.add('rgba({0},{1},{2},.9)'.format(__v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)]));
+        __c.add('rgba({0},{1},{2},.9)'.format(__v[~~(0, math_1.Random)(__l, 0)], __v[~~(0, math_1.Random)(__l, 0)], __v[~~(0, math_1.Random)(__l, 0)]));
         __x++;
     }
     return {
@@ -707,7 +708,8 @@ exports.createColors = function (v) {
         }
     };
 };
-exports.niceScale = function (min, max, steps) {
+exports.createColors = createColors;
+var niceScale = function (min, max, steps) {
     var range = __niceNum(max - min, false);
     var tickSpacing = __niceNum(range / (steps - 1), true);
     var niceMin = Math.floor(min / tickSpacing) * tickSpacing;
@@ -715,7 +717,8 @@ exports.niceScale = function (min, max, steps) {
     var result = { range: range,
         min: niceMin,
         max: niceMax,
-        tickSpacing: tickSpacing, values: Array() };
+        tickSpacing: tickSpacing,
+        values: Array() };
     function __niceNum(range, round) {
         var exponent = Math.floor(Math.log10(range));
         var fraction = range / Math.pow(10, exponent);
@@ -744,6 +747,7 @@ exports.niceScale = function (min, max, steps) {
     }
     return result;
 };
+exports.niceScale = niceScale;
 var PathBuilder = (function () {
     function PathBuilder() {
     }
@@ -788,9 +792,9 @@ var PathBuilder = (function () {
     return PathBuilder;
 }());
 exports.PathBuilder = PathBuilder;
-exports.describeArc = function (x, y, radius, startAngle, endAngle) {
-    var start = math_1.polarToCartesian(x, y, radius, endAngle - 90);
-    var end = math_1.polarToCartesian(x, y, radius, startAngle - 90);
+var describeArc = function (x, y, radius, startAngle, endAngle) {
+    var start = (0, math_1.polarToCartesian)(x, y, radius, endAngle - 90);
+    var end = (0, math_1.polarToCartesian)(x, y, radius, startAngle - 90);
     var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
     var d = [
         "M", start.x, start.y,
@@ -800,6 +804,7 @@ exports.describeArc = function (x, y, radius, startAngle, endAngle) {
     ].join(" ");
     return d;
 };
+exports.describeArc = describeArc;
 
 },{"../math":25}],6:[function(require,module,exports){
 "use strict";
@@ -814,10 +819,10 @@ var __template = '<div id="collapsible-box-{0}" class="w3-border">' +
 var __counter = 0;
 var CollapsibleBox = (function () {
     function CollapsibleBox(titulo, content, onexpand, height) {
-        var _this = this;
         if (titulo === void 0) { titulo = 't�tulo'; }
         if (onexpand === void 0) { onexpand = function (sender) { }; }
         if (height === void 0) { height = '10em'; }
+        var _this = this;
         this.loaded = false;
         this.collapsed = true;
         this.onexpand = new core_events_1.CoreEvent('CollapsibleBox.onexpand');
@@ -1196,7 +1201,7 @@ function addEventListeners(container, handlers, context) {
                             handlers[fnName] ||
                             core_1.core.getValue(fnName, context);
                         if (f)
-                            f.apply(context, tslib_1.__spreadArrays([e, data], tokens.slice(2)));
+                            f.apply(context, tslib_1.__spreadArray([e, data], tokens.slice(2), true));
                         return;
                     }
                     else {
@@ -1240,13 +1245,16 @@ var DialogHelper = (function () {
     }
     DialogHelper.getWrapper = function (id) {
         var __container = document.getElementById(id);
-        var __dlg = { container: __container, title: __container.querySelector('.js-title'),
+        var __dlg = { container: __container,
+            title: __container.querySelector('.js-title'),
             body: __container.querySelector('.js-content'),
             closeButton: __container.querySelector('.js-close-button'),
-            acceptButton: __container.querySelector('.js-accept-button'), close: function () {
+            acceptButton: __container.querySelector('.js-accept-button'),
+            close: function () {
                 __container.style.display = 'none';
                 return __dlg;
-            }, show: function (onConfirm) {
+            },
+            show: function (onConfirm) {
                 if (onConfirm) {
                     __dlg.acceptButton.onclick = function () {
                         onConfirm(__dlg);
@@ -1324,10 +1332,10 @@ function include(url) {
     return new Promise(function (resolve) {
         function __resolve() {
             includes.push(url.toLowerCase());
-            resolve();
+            resolve(null);
         }
         if (includes.indexOf(url.toLowerCase()) > -1) {
-            resolve();
+            resolve(null);
             return;
         }
         var script = document.createElement('script');
@@ -1402,7 +1410,8 @@ var Core = (function () {
             .join(separator === undefined ? '-' : (separator || ''));
     };
     Core.prototype.createStringBuilder = function (s) {
-        return { value: s || '', append: function (s) { this.value = this.value + s; return this; },
+        return { value: s || '',
+            append: function (s) { this.value = this.value + s; return this; },
             appendLine: function (s) { this.value = this.value + (s || '') + '\n'; return this; } };
     };
     Core.prototype.$ = function (e, control) {
@@ -1693,7 +1702,7 @@ Array.prototype.toDictionary = function (prop, value) {
 Array.prototype.split = function (size) {
     return this.reduce(function (acc, current, i, self) {
         if (!(i % size))
-            return tslib_1.__spreadArrays(acc, [self.slice(i, i + size)]);
+            return tslib_1.__spreadArray(tslib_1.__spreadArray([], acc, true), [self.slice(i, i + size)], false);
         return acc;
     }, []);
 };
@@ -1733,7 +1742,8 @@ var Paginator = (function () {
             endIndex: endIndex,
             allItems: data,
             visibleItems: data.slice(startIndex, endIndex + 1),
-            title: title, getChecked: function () { return data.where({ '__checked': true })
+            title: title,
+            getChecked: function () { return data.where({ '__checked': true })
                 .map(function (item, i) {
                 return { index: data.indexOf(item),
                     item: item };
@@ -1774,7 +1784,7 @@ var publish = function (topic) {
         var subscribers = topics.get(topic);
         var len = subscribers ? subscribers.length : 0;
         while (len--) {
-            (_a = subscribers[len]).func.apply(_a, tslib_1.__spreadArrays([topic], args));
+            (_a = subscribers[len]).func.apply(_a, tslib_1.__spreadArray([topic], args, false));
         }
     }, 0);
     return true;
@@ -1884,11 +1894,11 @@ var ReportEngine = (function () {
         _elements.forEach(function (child) {
             core_1.core.toArray(child.attributes)
                 .where({ value: /{[^{]+?}/g })
-                .map(function (a) { return a.value = core_templates_1.merge(a.value, scope); });
+                .map(function (a) { return a.value = (0, core_templates_1.merge)(a.value, scope); });
             core_1.core.toArray(child.childNodes)
                 .where({ nodeType: 3 })
                 .where({ textContent: /{[^{]+?}/g })
-                .forEach(function (text) { return text.textContent = core_templates_1.merge(text.textContent, scope, text); });
+                .forEach(function (text) { return text.textContent = (0, core_templates_1.merge)(text.textContent, scope, text); });
             String.trimValues(child.attributes
                 .getNamedItem('xbind')
                 .value
@@ -2396,7 +2406,8 @@ var ReportEngine = (function () {
                 rd: __rd,
                 definition: g,
                 current: '',
-                data: core_1.core.clone(__summary), init: function (value) {
+                data: core_1.core.clone(__summary),
+                init: function (value) {
                     var __k = value[this.definition.key].toString();
                     var __Gx = __that.BS[this.name];
                     __Gx.all[__k] = __Gx.all[__k] || [];
@@ -2762,7 +2773,7 @@ function fillTemplate(e, scope) {
         .toArray();
     var _repeatersElements = _repeaters.reduce(function (a, r) {
         return a.concat(core_1.core.$('[xbind]', r));
-    }, tslib_1.__spreadArrays(_repeaters));
+    }, tslib_1.__spreadArray([], _repeaters, true));
     var _elements = _root.querySelectorAll('[xbind]')
         .toArray()
         .filter(function (x) { return !_repeatersElements.includes(x); });
@@ -2778,7 +2789,7 @@ function fillTemplate(e, scope) {
         }
         core_1.core.toArray(child.attributes)
             .where({ value: /{[^{]+?}/g })
-            .map(function (a) { return a.value = merge(a.value, scope); });
+            .map(function (a) { return a.value = merge(a.value, scope, child); });
         core_1.core.toArray(child.childNodes)
             .where({ nodeType: 3 })
             .where({ textContent: /{[^{]+?}/g })
@@ -2831,7 +2842,8 @@ function executeTemplate(e, values, dom) {
     var _template = core_1.core.isString(e) ? core_1.core.$(e) : e;
     var _result = values.reduce(function (a, v, i) {
         var _node = { index: i,
-            data: v, node: fillTemplate(_template.cloneNode(true), v) };
+            data: v,
+            node: fillTemplate(_template.cloneNode(true), v) };
         a.nodes.push(_node);
         if (!dom)
             a.html.push(_node.node.outerHTML.replace(/xbind="[^"]*"/g, ''));
@@ -2858,7 +2870,7 @@ var TreeUtils = (function () {
             group[0].split('__')
                 .reduce(function (node, level, i, self) {
                 return node[level] = node[level] ||
-                    ((i == self.length - 1) ? { rows: tslib_1.__spreadArrays(group[1]) }
+                    ((i == self.length - 1) ? { rows: tslib_1.__spreadArray([], group[1], true) }
                         : {});
             }, node);
             return node;
@@ -2871,13 +2883,14 @@ var TreeUtils = (function () {
                 parent: parent,
                 deep: deep++,
                 rows: node.rows,
-                innerHTML: '', children: Object.keys(node)
+                innerHTML: '',
+                children: Object.keys(node)
                     .where(function (property) { return property != 'rows'; })
                     .sort()
                     .map(function (g) { return ({ name: g, value: node[g] }); }) };
             if (node.rows) {
                 deep--;
-                return core_templates_1.executeTemplate(leafTemplate, [__node]);
+                return (0, core_templates_1.executeTemplate)(leafTemplate, [__node]);
             }
             else {
                 __node.innerHTML = __node.children
@@ -2897,7 +2910,8 @@ var TreeUtils = (function () {
                 parent: parent,
                 deep: deep++,
                 rows: node.rows,
-                innerText: '', children: Object.keys(node)
+                innerText: '',
+                children: Object.keys(node)
                     .where(function (property) { return property != 'rows'; })
                     .sort()
                     .map(function (g) { return ({ name: g, value: node[g] }); }) };
@@ -3081,7 +3095,7 @@ exports.polarToCartesian = polarToCartesian;
 
 },{}],26:[function(require,module,exports){
 (function (global){(function (){
-/*! *****************************************************************************
+/******************************************************************************
 Copyright (c) Microsoft Corporation.
 
 Permission to use, copy, modify, and/or distribute this software for any
@@ -3095,13 +3109,16 @@ LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
 ***************************************************************************** */
-
 /* global global, define, System, Reflect, Promise */
 var __extends;
 var __assign;
 var __rest;
 var __decorate;
 var __param;
+var __esDecorate;
+var __runInitializers;
+var __propKey;
+var __setFunctionName;
 var __metadata;
 var __awaiter;
 var __generator;
@@ -3110,6 +3127,7 @@ var __values;
 var __read;
 var __spread;
 var __spreadArrays;
+var __spreadArray;
 var __await;
 var __asyncGenerator;
 var __asyncDelegator;
@@ -3119,6 +3137,7 @@ var __importStar;
 var __importDefault;
 var __classPrivateFieldGet;
 var __classPrivateFieldSet;
+var __classPrivateFieldIn;
 var __createBinding;
 (function (factory) {
     var root = typeof global === "object" ? global : typeof self === "object" ? self : typeof this === "object" ? this : {};
@@ -3146,9 +3165,11 @@ var __createBinding;
 (function (exporter) {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
 
     __extends = function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -3185,6 +3206,51 @@ var __createBinding;
         return function (target, key) { decorator(target, key, paramIndex); }
     };
 
+    __esDecorate = function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+        function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+        var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+        var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+        var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+        var _, done = false;
+        for (var i = decorators.length - 1; i >= 0; i--) {
+            var context = {};
+            for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+            for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+            context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+            var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+            if (kind === "accessor") {
+                if (result === void 0) continue;
+                if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+                if (_ = accept(result.get)) descriptor.get = _;
+                if (_ = accept(result.set)) descriptor.set = _;
+                if (_ = accept(result.init)) initializers.push(_);
+            }
+            else if (_ = accept(result)) {
+                if (kind === "field") initializers.push(_);
+                else descriptor[key] = _;
+            }
+        }
+        if (target) Object.defineProperty(target, contextIn.name, descriptor);
+        done = true;
+    };
+
+    __runInitializers = function (thisArg, initializers, value) {
+        var useValue = arguments.length > 2;
+        for (var i = 0; i < initializers.length; i++) {
+            value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+        }
+        return useValue ? value : void 0;
+    };
+
+    __propKey = function (x) {
+        return typeof x === "symbol" ? x : "".concat(x);
+    };
+
+    __setFunctionName = function (f, name, prefix) {
+        if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+        return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+    };
+
     __metadata = function (metadataKey, metadataValue) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
     };
@@ -3205,7 +3271,7 @@ var __createBinding;
         function verb(n) { return function (v) { return step([n, v]); }; }
         function step(op) {
             if (f) throw new TypeError("Generator is already executing.");
-            while (_) try {
+            while (g && (g = 0, op[0] && (_ = 0)), _) try {
                 if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
                 if (y = 0, t) op = [op[0] & 2, t.value];
                 switch (op[0]) {
@@ -3227,14 +3293,21 @@ var __createBinding;
         }
     };
 
-    __createBinding = function(o, m, k, k2) {
-        if (k2 === undefined) k2 = k;
-        o[k2] = m[k];
+    __exportStar = function(m, o) {
+        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
     };
 
-    __exportStar = function (m, exports) {
-        for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) exports[p] = m[p];
-    };
+    __createBinding = Object.create ? (function(o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        var desc = Object.getOwnPropertyDescriptor(m, k);
+        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+            desc = { enumerable: true, get: function() { return m[k]; } };
+        }
+        Object.defineProperty(o, k2, desc);
+    }) : (function(o, m, k, k2) {
+        if (k2 === undefined) k2 = k;
+        o[k2] = m[k];
+    });
 
     __values = function (o) {
         var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
@@ -3265,18 +3338,30 @@ var __createBinding;
         return ar;
     };
 
+    /** @deprecated */
     __spread = function () {
         for (var ar = [], i = 0; i < arguments.length; i++)
             ar = ar.concat(__read(arguments[i]));
         return ar;
     };
 
+    /** @deprecated */
     __spreadArrays = function () {
         for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
         for (var r = Array(s), k = 0, i = 0; i < il; i++)
             for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
                 r[k] = a[j];
         return r;
+    };
+
+    __spreadArray = function (to, from, pack) {
+        if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+            if (ar || !(i in from)) {
+                if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+                ar[i] = from[i];
+            }
+        }
+        return to.concat(ar || Array.prototype.slice.call(from));
     };
 
     __await = function (v) {
@@ -3298,7 +3383,7 @@ var __createBinding;
     __asyncDelegator = function (o) {
         var i, p;
         return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
-        function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; } : f; }
+        function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }
     };
 
     __asyncValues = function (o) {
@@ -3314,11 +3399,17 @@ var __createBinding;
         return cooked;
     };
 
+    var __setModuleDefault = Object.create ? (function(o, v) {
+        Object.defineProperty(o, "default", { enumerable: true, value: v });
+    }) : function(o, v) {
+        o["default"] = v;
+    };
+
     __importStar = function (mod) {
         if (mod && mod.__esModule) return mod;
         var result = {};
-        if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-        result["default"] = mod;
+        if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+        __setModuleDefault(result, mod);
         return result;
     };
 
@@ -3326,19 +3417,22 @@ var __createBinding;
         return (mod && mod.__esModule) ? mod : { "default": mod };
     };
 
-    __classPrivateFieldGet = function (receiver, privateMap) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError("attempted to get private field on non-instance");
-        }
-        return privateMap.get(receiver);
+    __classPrivateFieldGet = function (receiver, state, kind, f) {
+        if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+        if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+        return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
     };
 
-    __classPrivateFieldSet = function (receiver, privateMap, value) {
-        if (!privateMap.has(receiver)) {
-            throw new TypeError("attempted to set private field on non-instance");
-        }
-        privateMap.set(receiver, value);
-        return value;
+    __classPrivateFieldSet = function (receiver, state, value, kind, f) {
+        if (kind === "m") throw new TypeError("Private method is not writable");
+        if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+        if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+        return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+    };
+
+    __classPrivateFieldIn = function (state, receiver) {
+        if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
+        return typeof state === "function" ? receiver === state : state.has(receiver);
     };
 
     exporter("__extends", __extends);
@@ -3346,6 +3440,10 @@ var __createBinding;
     exporter("__rest", __rest);
     exporter("__decorate", __decorate);
     exporter("__param", __param);
+    exporter("__esDecorate", __esDecorate);
+    exporter("__runInitializers", __runInitializers);
+    exporter("__propKey", __propKey);
+    exporter("__setFunctionName", __setFunctionName);
     exporter("__metadata", __metadata);
     exporter("__awaiter", __awaiter);
     exporter("__generator", __generator);
@@ -3355,6 +3453,7 @@ var __createBinding;
     exporter("__read", __read);
     exporter("__spread", __spread);
     exporter("__spreadArrays", __spreadArrays);
+    exporter("__spreadArray", __spreadArray);
     exporter("__await", __await);
     exporter("__asyncGenerator", __asyncGenerator);
     exporter("__asyncDelegator", __asyncDelegator);
@@ -3364,6 +3463,7 @@ var __createBinding;
     exporter("__importDefault", __importDefault);
     exporter("__classPrivateFieldGet", __classPrivateFieldGet);
     exporter("__classPrivateFieldSet", __classPrivateFieldSet);
+    exporter("__classPrivateFieldIn", __classPrivateFieldIn);
 });
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})

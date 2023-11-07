@@ -10,10 +10,10 @@ var __template = '<div id="collapsible-box-{0}" class="w3-border">' +
 var __counter = 0;
 var CollapsibleBox = (function () {
     function CollapsibleBox(titulo, content, onexpand, height) {
-        var _this = this;
         if (titulo === void 0) { titulo = 't�tulo'; }
         if (onexpand === void 0) { onexpand = function (sender) { }; }
         if (height === void 0) { height = '10em'; }
+        var _this = this;
         this.loaded = false;
         this.collapsed = true;
         this.onexpand = new core_events_1.CoreEvent('CollapsibleBox.onexpand');

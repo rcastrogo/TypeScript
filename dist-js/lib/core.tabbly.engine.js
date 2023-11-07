@@ -74,11 +74,11 @@ var ReportEngine = (function () {
         _elements.forEach(function (child) {
             core_1.core.toArray(child.attributes)
                 .where({ value: /{[^{]+?}/g })
-                .map(function (a) { return a.value = core_templates_1.merge(a.value, scope); });
+                .map(function (a) { return a.value = (0, core_templates_1.merge)(a.value, scope); });
             core_1.core.toArray(child.childNodes)
                 .where({ nodeType: 3 })
                 .where({ textContent: /{[^{]+?}/g })
-                .forEach(function (text) { return text.textContent = core_templates_1.merge(text.textContent, scope, text); });
+                .forEach(function (text) { return text.textContent = (0, core_templates_1.merge)(text.textContent, scope, text); });
             String.trimValues(child.attributes
                 .getNamedItem('xbind')
                 .value

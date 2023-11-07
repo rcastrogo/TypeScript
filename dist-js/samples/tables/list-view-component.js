@@ -25,7 +25,7 @@ var ListViewComponent = (function () {
         container.appendChild(core_1.core.build('div', { innerHTML: list_view_component_ts_html_1.default }, true));
         this._header = container.querySelector('[header]');
         this._listView = container.querySelector('[list-view-body]');
-        core_declarative_1.addEventListeners(container, {
+        (0, core_declarative_1.addEventListeners)(container, {
             doAction: function (sender, event, name, data) {
                 _this.doAction({ name: name, data: data });
             },
@@ -80,7 +80,7 @@ var ListViewComponent = (function () {
         else {
             this._paginationInfo.title = __template;
         }
-        core_templates_1.fillTemplate(this._header, this._paginationInfo);
+        (0, core_templates_1.fillTemplate)(this._header, this._paginationInfo);
     };
     ListViewComponent.prototype.syncContent = function () {
         var _this = this;

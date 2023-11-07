@@ -44,7 +44,7 @@ function fillTemplate(e, scope) {
         .toArray();
     var _repeatersElements = _repeaters.reduce(function (a, r) {
         return a.concat(core_1.core.$('[xbind]', r));
-    }, tslib_1.__spreadArrays(_repeaters));
+    }, tslib_1.__spreadArray([], _repeaters, true));
     var _elements = _root.querySelectorAll('[xbind]')
         .toArray()
         .filter(function (x) { return !_repeatersElements.includes(x); });
@@ -60,7 +60,7 @@ function fillTemplate(e, scope) {
         }
         core_1.core.toArray(child.attributes)
             .where({ value: /{[^{]+?}/g })
-            .map(function (a) { return a.value = merge(a.value, scope); });
+            .map(function (a) { return a.value = merge(a.value, scope, child); });
         core_1.core.toArray(child.childNodes)
             .where({ nodeType: 3 })
             .where({ textContent: /{[^{]+?}/g })
@@ -113,7 +113,8 @@ function executeTemplate(e, values, dom) {
     var _template = core_1.core.isString(e) ? core_1.core.$(e) : e;
     var _result = values.reduce(function (a, v, i) {
         var _node = { index: i,
-            data: v, node: fillTemplate(_template.cloneNode(true), v) };
+            data: v,
+            node: fillTemplate(_template.cloneNode(true), v) };
         a.nodes.push(_node);
         if (!dom)
             a.html.push(_node.node.outerHTML.replace(/xbind="[^"]*"/g, ''));

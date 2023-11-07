@@ -10,7 +10,7 @@ var g = require("@src/math");
 var charts_1 = require("@src/charts/charts");
 var utils_1 = require("../lib/charts/utils");
 var lines_1 = require("../lib/charts/lines");
-var COLORS = utils_1.createColors(30);
+var COLORS = (0, utils_1.createColors)(30);
 var SvgBarChartAction = (function () {
     function SvgBarChartAction() {
     }
@@ -169,7 +169,7 @@ var BarChartAction = (function () {
             });
         }, 200);
         core_pub_sub_1.default.publish('msg/main-page/test/content', '<p>Generación de gráficos de barras (svg + executeTemplate)</p>' +
-            core_templates_1.executeTemplate(__template, [__context]));
+            (0, core_templates_1.executeTemplate)(__template, [__context]));
     };
     return BarChartAction;
 }());
@@ -240,7 +240,7 @@ var PieChartAction = (function () {
             fn: {
                 calc: function (value, target) {
                     var __trans = value.direction.clone().mul(4);
-                    target.setAttribute('d', utils_1.describeArc(0, 0, 150, value.arc_start, value.arc_end));
+                    target.setAttribute('d', (0, utils_1.describeArc)(0, 0, 150, value.arc_start, value.arc_end));
                     target.setAttribute('transform', 'translate({x},{y})'.format(__trans));
                     target.setAttribute('fill', COLORS.next());
                     return 'sector-{0}'.format(value.index);
@@ -255,7 +255,7 @@ var PieChartAction = (function () {
             }
         };
         core_pub_sub_1.default.publish('msg/main-page/test/content', '<p>Generación de gráficos de tarta (svg + executeTemplate)</p>' +
-            core_templates_1.executeTemplate(__template, [__context]));
+            (0, core_templates_1.executeTemplate)(__template, [__context]));
     };
     return PieChartAction;
 }());
@@ -265,7 +265,7 @@ var LineChartAction = (function () {
     }
     LineChartAction.prototype.run = function () {
         var __max = 60;
-        var __document = lines_1.createDocument({
+        var __document = (0, lines_1.createDocument)({
             streams: {
                 distance: { data: [0, 100, 200, 300, 500, 800, 900, 950, 1000] },
                 altitude: { data: [150, 50, 26, 155, 60, 45, 40, 80, 0] },

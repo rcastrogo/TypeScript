@@ -28,11 +28,11 @@ function merge(template: string, o: any, HTMLElemnt?:HTMLElement) {
       return __call_fn(core.getValue(name, o), _params, [value]);
     }
     let [name, params] = String.trimValues(key.split(/=>/)); 
-    var value = core.getValue(name, o);
+    var value = core.getValue(name, o, HTMLElemnt);
     if(core.isFunction(value))
       return __call_fn(value, params.split(/\s|\;/), []);
     else
-      return value;                   
+      return value;
   });     
   return __result;
 }
@@ -70,7 +70,7 @@ function fillTemplate(e:HTMLElement, scope:any):HTMLElement {
     // ============================================================================
     core.toArray(child.attributes)
         .where({ value : /{[^{]+?}/g })
-        .map(a => a.value = merge(a.value, scope));
+        .map(a => a.value = merge(a.value, scope, child));
     // ============================================================================
     // Nodos texto de este elemento
     // ============================================================================

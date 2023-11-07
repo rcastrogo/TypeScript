@@ -20,14 +20,14 @@ var TabblyReportsJsView = (function () {
         var _this = this;
         target.innerHTML = '';
         target.appendChild(this._content);
-        core_declarative_1.addEventListeners(target, {
+        (0, core_declarative_1.addEventListeners)(target, {
             localInnerText: function (e, value) {
                 e.innerText = value;
                 e.innerHTML = w3CodeColorize(e.innerHTML, 'js');
             }
         }, {});
         this.__loadReport(this._content.querySelector('[report-container]'));
-        core_include_1.default('./js/w3codecolor.js')
+        (0, core_include_1.default)('./js/w3codecolor.js')
             .then(function () { return _this.__colorize(); });
     };
     TabblyReportsJsView.prototype.__colorize = function () {
@@ -46,14 +46,14 @@ var TabblyReportsJsView = (function () {
             flush: function () { },
             clear: function () { this.buffer = ''; }
         };
-        core_include_1.default('./js/pro-0001.js').then(function (cancel) {
+        (0, core_include_1.default)('./js/pro-0001.js').then(function (cancel) {
             var __rd = __reportDefinition(core_tabbly_v2_loader_1.loader, core_1.core);
             core_ajax_1.ajax.get('./js/data/proveedores.json')
                 .then(function (res) {
                 __handler.clear();
                 new core_tabbly_v2_engine_1.ReportEngine().generateReport(__rd, JSON.parse(res), __handler);
                 target.appendChild(core_1.core.build('div', { innerHTML: __handler.buffer }));
-                core_declarative_1.addEventListeners(target, {}, __rd.getContext());
+                (0, core_declarative_1.addEventListeners)(target, {}, __rd.getContext());
                 cancel();
                 core_pub_sub_1.default.publish('msg/rpt/data', JSON.stringify(JSON.parse(res), null, 2));
             });

@@ -14,7 +14,7 @@ var TreeUtils = (function () {
             group[0].split('__')
                 .reduce(function (node, level, i, self) {
                 return node[level] = node[level] ||
-                    ((i == self.length - 1) ? { rows: tslib_1.__spreadArrays(group[1]) }
+                    ((i == self.length - 1) ? { rows: tslib_1.__spreadArray([], group[1], true) }
                         : {});
             }, node);
             return node;
@@ -27,13 +27,14 @@ var TreeUtils = (function () {
                 parent: parent,
                 deep: deep++,
                 rows: node.rows,
-                innerHTML: '', children: Object.keys(node)
+                innerHTML: '',
+                children: Object.keys(node)
                     .where(function (property) { return property != 'rows'; })
                     .sort()
                     .map(function (g) { return ({ name: g, value: node[g] }); }) };
             if (node.rows) {
                 deep--;
-                return core_templates_1.executeTemplate(leafTemplate, [__node]);
+                return (0, core_templates_1.executeTemplate)(leafTemplate, [__node]);
             }
             else {
                 __node.innerHTML = __node.children
@@ -53,7 +54,8 @@ var TreeUtils = (function () {
                 parent: parent,
                 deep: deep++,
                 rows: node.rows,
-                innerText: '', children: Object.keys(node)
+                innerText: '',
+                children: Object.keys(node)
                     .where(function (property) { return property != 'rows'; })
                     .sort()
                     .map(function (g) { return ({ name: g, value: node[g] }); }) };

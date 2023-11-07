@@ -52,7 +52,8 @@ var Core = (function () {
             .join(separator === undefined ? '-' : (separator || ''));
     };
     Core.prototype.createStringBuilder = function (s) {
-        return { value: s || '', append: function (s) { this.value = this.value + s; return this; },
+        return { value: s || '',
+            append: function (s) { this.value = this.value + s; return this; },
             appendLine: function (s) { this.value = this.value + (s || '') + '\n'; return this; } };
     };
     Core.prototype.$ = function (e, control) {
@@ -343,7 +344,7 @@ Array.prototype.toDictionary = function (prop, value) {
 Array.prototype.split = function (size) {
     return this.reduce(function (acc, current, i, self) {
         if (!(i % size))
-            return tslib_1.__spreadArrays(acc, [self.slice(i, i + size)]);
+            return tslib_1.__spreadArray(tslib_1.__spreadArray([], acc, true), [self.slice(i, i + size)], false);
         return acc;
     }, []);
 };

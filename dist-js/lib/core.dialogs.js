@@ -6,13 +6,16 @@ var DialogHelper = (function () {
     }
     DialogHelper.getWrapper = function (id) {
         var __container = document.getElementById(id);
-        var __dlg = { container: __container, title: __container.querySelector('.js-title'),
+        var __dlg = { container: __container,
+            title: __container.querySelector('.js-title'),
             body: __container.querySelector('.js-content'),
             closeButton: __container.querySelector('.js-close-button'),
-            acceptButton: __container.querySelector('.js-accept-button'), close: function () {
+            acceptButton: __container.querySelector('.js-accept-button'),
+            close: function () {
                 __container.style.display = 'none';
                 return __dlg;
-            }, show: function (onConfirm) {
+            },
+            show: function (onConfirm) {
                 if (onConfirm) {
                     __dlg.acceptButton.onclick = function () {
                         onConfirm(__dlg);

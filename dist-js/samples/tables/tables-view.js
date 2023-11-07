@@ -19,10 +19,10 @@ var TablesView = (function () {
         var _this = this;
         target.innerHTML = '';
         target.appendChild(this._content);
-        core_declarative_1.addEventListeners(target, {
+        (0, core_declarative_1.addEventListeners)(target, {
             localInnerText: function (e, value, mode) {
                 e.innerText = value;
-                core_include_1.default('./js/w3codecolor.js')
+                (0, core_include_1.default)('./js/w3codecolor.js')
                     .then(function () { return e.innerHTML = w3CodeColorize(e.innerHTML, mode); });
             }
         }, {});
@@ -32,7 +32,7 @@ var TablesView = (function () {
         controls_collapsible_box_1.CollapsibleBox.create('Listview', '-')
             .appendTo(core_1.core.element('[list-view-container]', this._content))
             .onexpand.add(this.__loadListview);
-        core_include_1.default('./js/w3codecolor.js')
+        (0, core_include_1.default)('./js/w3codecolor.js')
             .then(function () { return _this.__colorize(); });
     };
     TablesView.prototype.__loadListview = function (event, sender) {

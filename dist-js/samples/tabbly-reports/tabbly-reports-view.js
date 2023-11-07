@@ -20,14 +20,14 @@ var TabblyReportsView = (function () {
         var _this = this;
         target.innerHTML = '';
         target.appendChild(this._content);
-        core_declarative_1.addEventListeners(target, {
+        (0, core_declarative_1.addEventListeners)(target, {
             localInnerText: function (e, value) {
                 e.innerText = value;
                 e.innerHTML = w3CodeColorize(e.innerHTML, 'js');
             }
         }, {});
         this.__loadReport(this._content.querySelector('[report-container]'));
-        core_include_1.default('./js/w3codecolor.js')
+        (0, core_include_1.default)('./js/w3codecolor.js')
             .then(function () { return _this.__colorize(); });
     };
     TabblyReportsView.prototype.__colorize = function () {
@@ -48,7 +48,7 @@ var TabblyReportsView = (function () {
                 new core_tabbly_engine_1.ReportEngine()
                     .fromReportDefinition(__rd, JSON.parse(res), function (html) {
                     target.appendChild(core_1.core.build('div', { innerHTML: html }, true));
-                    core_declarative_1.addEventListeners(target, {}, __rd.getContext());
+                    (0, core_declarative_1.addEventListeners)(target, {}, __rd.getContext());
                 });
             });
         });

@@ -48,7 +48,7 @@ function addEventListeners(container, handlers, context) {
                             handlers[fnName] ||
                             core_1.core.getValue(fnName, context);
                         if (f)
-                            f.apply(context, tslib_1.__spreadArrays([e, data], tokens.slice(2)));
+                            f.apply(context, tslib_1.__spreadArray([e, data], tokens.slice(2), true));
                         return;
                     }
                     else {

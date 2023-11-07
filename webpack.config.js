@@ -12,17 +12,17 @@ module.exports = (env, options) => {
 		devtool: isDevelopment ? 'inline-source-map' : undefined,
 		entry: './src/app.ts',
 		output: {
-		  filename: isDevelopment ? '[name].js' : '[name].[hash].js',
+		  filename: isDevelopment ? '[name].js' : '[name].[fullhash].js',
 		  path: path.resolve(__dirname, 'docs')
 		},
 		devServer: {
 		  port: 8080,
-		  contentBase: path.join(__dirname, 'docs'),
+			static: path.resolve(__dirname, 'docs'),
 		  historyApiFallback: true
 		},
 		plugins: [
 		  new HtmlWebpackPlugin({
-				hash: false,
+				fullhash: true,
 				template: './src/index.html',
 				templateParameters: {
 					title   : 'TypeScript',
@@ -30,7 +30,7 @@ module.exports = (env, options) => {
 				}
 		  }),
 		  new HtmlWebpackPlugin({
-				hash: false,
+				fullhash: true,
 				filename: '404.html',
 				template: './src/index.html',
 				templateParameters: {

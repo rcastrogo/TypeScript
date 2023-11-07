@@ -17,7 +17,7 @@ var PubSubView = (function () {
         this._content = core_1.core.build('div', { innerHTML: pub_sub_view_ts_html_1.default }, true);
         target.innerHTML = '';
         target.appendChild(this._content);
-        core_declarative_1.addEventListeners(target, {
+        (0, core_declarative_1.addEventListeners)(target, {
             doPublish: function () {
                 core_pub_sub_1.default.publish(core_pub_sub_1.default.TOPICS.NOTIFICATION, 'Botón doPublish');
                 setTimeout(function () {
@@ -25,7 +25,7 @@ var PubSubView = (function () {
                 }, 2000);
             }
         }, {});
-        core_include_1.default('./js/w3codecolor.js')
+        (0, core_include_1.default)('./js/w3codecolor.js')
             .then(function () { return _this.__colorize(); });
     };
     PubSubView.prototype.__colorize = function () {

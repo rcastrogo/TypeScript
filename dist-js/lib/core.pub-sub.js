@@ -27,7 +27,7 @@ var publish = function (topic) {
         var subscribers = topics.get(topic);
         var len = subscribers ? subscribers.length : 0;
         while (len--) {
-            (_a = subscribers[len]).func.apply(_a, tslib_1.__spreadArrays([topic], args));
+            (_a = subscribers[len]).func.apply(_a, tslib_1.__spreadArray([topic], args, false));
         }
     }, 0);
     return true;

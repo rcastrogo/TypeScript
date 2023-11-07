@@ -101,7 +101,64 @@ class Core implements CoreConstructor{
     return __instance;
   }
 
-  getValue(key : string, scope? : any) : any {  
+  //getValueExt(key, scope, htmlElement) {
+  //    var target = scope || self;
+  //    var parts  = String.trimValues(key.split('|'));
+  //    var tokens = parts.shift().split(/\.|\[|\]/).filter(function(t){ return t; });
+  //    var last   = tokens.pop();
+  //    var i      = 0;
+  //    while(tokens.length){  
+  //        i++;
+  //        var propName = tokens.shift();
+  //        if(propName in target) {
+  //            target = target[propName];
+  //            continue;
+  //        }
+  //        if(i > 1) {
+  //            //throw Error('getVal error: {0} - {1}'.format(key, propName));
+  //            console.log('Eror getValue: {0} - {1}'.format(key, propName));
+  //            return '';
+  //        }
+  //        var value = undefined;
+  //        // =============================================================================
+  //        // Buscar la propiedad en un ambito superior si existe
+  //        // =============================================================================
+  //        if (target.outerScope) value = module.core.getValue(propName, target.outerScope);
+  //        // =============================================================================
+  //        // Buscar la propiedad en el contexto global
+  //        // =============================================================================
+  //        if (value === undefined && propName in self) target = value = self[propName];
+  //        if(value === undefined){ 
+  //            console.log('Eror getValue: {0} - {1}'.format(key, propName));
+  //            return '';
+  //        }
+  //    }
+  //    // =====================================================================================
+  //    // Prototipo/función de transformación/formateo libro.name|htmlDecode,p1,p2,...|toString
+  //    // =====================================================================================               
+  //    if (parts.length > 0) { 
+  //        return parts.reduce(function(acc, e){ 
+  //            var arg  = String.trimValues(e.split(','));            
+  //            var name = arg[0];
+  //            arg      = arg.slice(1);
+  //            // ==================================================
+  //            // Prototipo
+  //            // ==================================================
+  //            var fn = acc.__proto__[name];             
+  //            if(fn) return fn.apply(acc, arg);
+  //            // ==================================================
+  //            // Función (window:Objeto:nombreFuncion,p0,p1,p2
+  //            // ==================================================
+  //            name = name.replace(/[\:>#]/g, '.');
+  //            fn  = module.core.getValue(name, scope || self);
+  //            arg = [acc, htmlElement].concat(arg);
+  //            if(fn) return fn.apply(scope || self, arg);            
+  //        }, target[last]);
+  //    };
+  //    return target[last];
+  //}
+
+  getValue(key : string, scope? : any, HTMLElemnt?:HTMLElement) : any {  
     return key.split(/\.|\[|\]/)
               .reduce( function(a, b){
                 if (b === '') return a;

@@ -4,7 +4,7 @@ var utils_1 = require("./utils");
 var math_1 = require("../math");
 var core_1 = require("../core");
 var STEPS_SCALE_Y = 25;
-var COLORS = utils_1.createColors(30);
+var COLORS = (0, utils_1.createColors)(30);
 var BarChart = (function () {
     function BarChart(width, height, data, o) {
         var _this = this;
@@ -131,7 +131,7 @@ var BarChart = (function () {
             '      stroke-width="1"/>';
         this.saveContext();
         this.currentFont.textAnchor = 'end';
-        utils_1.niceScale(0, this.maxValue, STEPS_SCALE_Y)
+        (0, utils_1.niceScale)(0, this.maxValue, STEPS_SCALE_Y)
             .values
             .forEach(function (value) {
             var __height = _this.worldToScreenY(value);

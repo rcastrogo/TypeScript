@@ -106,7 +106,8 @@ var ReportEngine = (function () {
                 rd: __rd,
                 definition: g,
                 current: '',
-                data: core_1.core.clone(__summary), init: function (value) {
+                data: core_1.core.clone(__summary),
+                init: function (value) {
                     var __k = value[this.definition.key].toString();
                     var __Gx = __that.BS[this.name];
                     __Gx.all[__k] = __Gx.all[__k] || [];

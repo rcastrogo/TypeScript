@@ -27,8 +27,8 @@ var ContentEditableView = (function () {
         this._content = core_1.core.build('div', { innerHTML: content_editable_view_ts_html_1.default }, true);
         target.innerHTML = '';
         target.appendChild(this._content);
-        core_templates_1.fillTemplate(target, { data: this._data });
-        core_declarative_1.addEventListeners(target, {
+        (0, core_templates_1.fillTemplate)(target, { data: this._data });
+        (0, core_declarative_1.addEventListeners)(target, {
             writeLog: function (e, value, mode) {
                 if (mode && mode == 'append')
                     return e.innerHTML += value + '<br/>';

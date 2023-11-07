@@ -28,7 +28,7 @@ var ProveedoresPageComponent = (function () {
         core_pub_sub_1.default.publish('msg/table/template', this._tbody.parentElement.outerHTML);
         this._tr_template = container.querySelector('table tbody tr');
         this._tbody.removeChild(this._tr_template);
-        core_declarative_1.addEventListeners(container, {
+        (0, core_declarative_1.addEventListeners)(container, {
             doAction: function (sender, event, name, data) {
                 _this.doAction({ name: name, data: data });
             },
@@ -85,7 +85,7 @@ var ProveedoresPageComponent = (function () {
                 return proveedor.__checked ? 'checked' : '';
             }
         };
-        core_declarative_1.addEventListeners(core_templates_1.fillTemplate(this._tbody, this.paginationInfo), {
+        (0, core_declarative_1.addEventListeners)((0, core_templates_1.fillTemplate)(this._tbody, this.paginationInfo), {
             doAction: function (sender, event, name, data) {
                 _this.doAction({ name: name, data: data });
             },
@@ -107,7 +107,7 @@ var ProveedoresPageComponent = (function () {
         else {
             this.paginationInfo.title = __template;
         }
-        core_templates_1.fillTemplate(this._header, this.paginationInfo);
+        (0, core_templates_1.fillTemplate)(this._header, this.paginationInfo);
     };
     ProveedoresPageComponent.prototype.goToPageOf = function (target) {
         var __index = this.proveedores.indexOf(target);
@@ -186,7 +186,7 @@ var ProveedoresPageComponent = (function () {
         var _this = this;
         this._dialog = this._dialog || core_1.core.$('proveedor-edit-dialog');
         this.current = { _id: 0, _nif: '', _nombre: '', _descripcion: '', _fechaDeAlta: '' };
-        core_templates_1.fillTemplate(this._dialog, this.current);
+        (0, core_templates_1.fillTemplate)(this._dialog, this.current);
         core_dialogs_1.DialogHelper.getWrapper('dialog-container')
             .setTitle('Nuevo vehículo')
             .setBody(this._dialog)
@@ -219,7 +219,7 @@ var ProveedoresPageComponent = (function () {
             .setBody(this._dialog)
             .disableClickOutside()
             .init(function (dlg) {
-            core_templates_1.fillTemplate(_this._dialog, _this.current);
+            (0, core_templates_1.fillTemplate)(_this._dialog, _this.current);
         })
             .show(function (dlg) {
             var __payload = {

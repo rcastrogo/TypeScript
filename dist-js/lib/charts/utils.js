@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.describeArc = exports.PathBuilder = exports.niceScale = exports.createColors = void 0;
 var math_1 = require("../math");
-exports.createColors = function (v) {
+var createColors = function (v) {
     var __v = [0, 51, 102, 153, 204, 255];
     var __l = __v.length - 1;
     var __c = [];
     var __x = 0;
     while (__x < v) {
-        __c.add('rgba({0},{1},{2},.9)'.format(__v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)], __v[~~math_1.Random(__l, 0)]));
+        __c.add('rgba({0},{1},{2},.9)'.format(__v[~~(0, math_1.Random)(__l, 0)], __v[~~(0, math_1.Random)(__l, 0)], __v[~~(0, math_1.Random)(__l, 0)]));
         __x++;
     }
     return {
@@ -20,7 +20,8 @@ exports.createColors = function (v) {
         }
     };
 };
-exports.niceScale = function (min, max, steps) {
+exports.createColors = createColors;
+var niceScale = function (min, max, steps) {
     var range = __niceNum(max - min, false);
     var tickSpacing = __niceNum(range / (steps - 1), true);
     var niceMin = Math.floor(min / tickSpacing) * tickSpacing;
@@ -28,7 +29,8 @@ exports.niceScale = function (min, max, steps) {
     var result = { range: range,
         min: niceMin,
         max: niceMax,
-        tickSpacing: tickSpacing, values: Array() };
+        tickSpacing: tickSpacing,
+        values: Array() };
     function __niceNum(range, round) {
         var exponent = Math.floor(Math.log10(range));
         var fraction = range / Math.pow(10, exponent);
@@ -57,6 +59,7 @@ exports.niceScale = function (min, max, steps) {
     }
     return result;
 };
+exports.niceScale = niceScale;
 var PathBuilder = (function () {
     function PathBuilder() {
     }
@@ -101,9 +104,9 @@ var PathBuilder = (function () {
     return PathBuilder;
 }());
 exports.PathBuilder = PathBuilder;
-exports.describeArc = function (x, y, radius, startAngle, endAngle) {
-    var start = math_1.polarToCartesian(x, y, radius, endAngle - 90);
-    var end = math_1.polarToCartesian(x, y, radius, startAngle - 90);
+var describeArc = function (x, y, radius, startAngle, endAngle) {
+    var start = (0, math_1.polarToCartesian)(x, y, radius, endAngle - 90);
+    var end = (0, math_1.polarToCartesian)(x, y, radius, startAngle - 90);
     var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
     var d = [
         "M", start.x, start.y,
@@ -113,3 +116,4 @@ exports.describeArc = function (x, y, radius, startAngle, endAngle) {
     ].join(" ");
     return d;
 };
+exports.describeArc = describeArc;

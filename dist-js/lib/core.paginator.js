@@ -25,7 +25,8 @@ var Paginator = (function () {
             endIndex: endIndex,
             allItems: data,
             visibleItems: data.slice(startIndex, endIndex + 1),
-            title: title, getChecked: function () { return data.where({ '__checked': true })
+            title: title,
+            getChecked: function () { return data.where({ '__checked': true })
                 .map(function (item, i) {
                 return { index: data.indexOf(item),
                     item: item };

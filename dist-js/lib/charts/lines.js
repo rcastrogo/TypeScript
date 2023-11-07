@@ -6,7 +6,7 @@ var math_1 = require("../math");
 var core_1 = require("../core");
 var core_pub_sub_1 = require("../core.pub-sub");
 var STEPS_SCALE_Y = 8;
-var COLORS = utils_1.createColors(30);
+var COLORS = (0, utils_1.createColors)(30);
 var LineChart = (function () {
     function LineChart(width, height, document, o) {
         var _this = this;
@@ -178,7 +178,7 @@ var LineChart = (function () {
         this.currentFont.fontSize = '9px';
         this.currentFont.textAnchor = 'end';
         var __serie = this.document.series[0];
-        var __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+        var __scale = (0, utils_1.niceScale)(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
         __scale.values
             .forEach(function (value) {
             var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
@@ -191,7 +191,7 @@ var LineChart = (function () {
         if (this.document.series[1]) {
             this.currentFont.textAnchor = 'start';
             __serie = this.document.series[1];
-            __scale = utils_1.niceScale(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
+            __scale = (0, utils_1.niceScale)(__serie.view.min, __serie.view.max, STEPS_SCALE_Y);
             __scale.values
                 .forEach(function (value) {
                 var __y = __serie.transform ? __serie.transform(_this, value) : _this.worldToScreenY(value);
@@ -214,7 +214,7 @@ var LineChart = (function () {
         var __v_tmp = '<line x1="{0}" y1="{1}" x2="{0}" y2="{2}" stroke="gray" stroke-width="1" />';
         var __offsetX = this.worldToScreenX(this.document.view.x.min) - this.bounds.left;
         var __html = '';
-        var __scale = utils_1.niceScale(this.document.view.x.min, this.document.view.x.max, Math.floor(this.bounds.width / 50));
+        var __scale = (0, utils_1.niceScale)(this.document.view.x.min, this.document.view.x.max, Math.floor(this.bounds.width / 50));
         this.currentFont.fontSize = '9px';
         __scale.values
             .forEach(function (value) {
@@ -355,7 +355,8 @@ function createDocument(dataset) {
                 fillStyle: 'rgba(150,0,0,.8)',
                 lineWidth: 3,
                 strokeStyle: 'rgba(00,0,250,.9)',
-                ratio: 100.0 / document.view.h.range, transform: function (sender, v) {
+                ratio: 100.0 / document.view.h.range,
+                transform: function (sender, v) {
                     return sender.bounds.top +
                         sender.bounds.height -
                         ((v - sender.document.view.h.min) *

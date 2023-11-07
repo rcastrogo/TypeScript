@@ -17,7 +17,7 @@ var tree_1 = require("./samples/tree");
 function appComponent(container) {
     var _config = core_1.core.config(app_constants_1.Constants.APP_CONFIG_NAME);
     container.innerHTML = app_component_ts_html_1.default;
-    core_declarative_1.addEventListeners(container, {
+    (0, core_declarative_1.addEventListeners)(container, {
         openLink: function (sender, event, viewId) {
             document.querySelectorAll('.city')
                 .toArray()

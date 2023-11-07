@@ -26,7 +26,7 @@ var ajax = {
         xml.setRequestHeader('Content-type', 'application/x-www-form-urlencoded; charset:ISO-8859-1');
       }
       xml.onreadystatechange = function() { if (xml.readyState == 4) resolve(xml.responseText) };
-      xml.send(body);        
+      xml.send(body as Document);        
     });
   },
   callWebMethod : function(url: string, body: string | null, callBack: Function) {

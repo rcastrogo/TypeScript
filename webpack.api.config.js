@@ -12,7 +12,7 @@ module.exports = (env, options) => {
       libraryTarget: 'umd',
 			umdNamedDefine: true,
 			globalObject: 'this',
-      filename: 'rcg.bundle.min.js',
+            filename: 'rcg.bundle.min.js',
 		  path: path.resolve(__dirname, 'dist-js/lib')
 		},
 	  module: {
