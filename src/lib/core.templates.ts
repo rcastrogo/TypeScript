@@ -44,6 +44,20 @@ function fillTemplate(e:HTMLElement, scope:any):HTMLElement {
   // ==============================================================================
   var _repeaters =  _root.querySelectorAll<HTMLElement>('[xfor]')
                          .toArray();
+  // ==============================================================================
+  // Eliminar repeaters anidados
+  // ==============================================================================
+  //var _repeaters = ekt.core.$('[xfor]', _root,[])
+  //                          .reduce(function(acc, repeater){
+  //                                    var parent = repeater.parentNode;
+  //                                    while(parent && parent != _root){
+  //                                      if(parent.attributes['xfor']) return acc;
+  //                                      parent = parent.parentNode;
+  //                                    }
+  //                                    acc.push(repeater);
+  //                                    return acc;
+  //                                  }, []);
+
   var _repeatersElements = _repeaters.reduce((a, r) => {
     return a.concat(core.$('[xbind]', r));
   }, [..._repeaters]);
